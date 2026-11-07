@@ -42,3 +42,5 @@ KEAMANAN DAN BATASAN
 
 KATALOG SERVER SAAT INI
 Telegram Premium Rp230.000; Netflix Premium Rp65.000; Spotify Premium Rp45.000; ChatGPT Premium Rp90.000 per item. X Premium masih diarahkan ke admin karena harga belum ditetapkan.
+
+Tema visual: Orange (#F97316), orange gelap (#EA580C), dan latar lembut (#FFF7ED).
