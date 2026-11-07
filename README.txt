@@ -44,3 +44,13 @@ KATALOG SERVER SAAT INI
 Telegram Premium Rp230.000; Netflix Premium Rp65.000; Spotify Premium Rp45.000; ChatGPT Premium Rp90.000 per item. X Premium masih diarahkan ke admin karena harga belum ditetapkan.
 
 Tema visual: Orange (#F97316), orange gelap (#EA580C), dan latar lembut (#FFF7ED).
+
+
+PEMBARUAN KATALOG WENZZSTORE
+- Katalog website memuat 10 produk: Telegram Premium, Netflix Premium, Spotify Premium, ChatGPT Premium, X Premium, VIU Premium, YouTube Premium, iQIYI Premium, Canva Pro, dan Disney+ Premium. Telegram Stars tidak dimasukkan.
+- Setiap produk memiliki deskripsi manfaat, keterangan tipe akses/durasi yang perlu dikonfirmasi, serta harga mulai dari yang diberikan pemilik toko.
+- Telegram Premium menampilkan paket rekomendasi 3 bulan Rp259.000, 6 bulan Rp369.000, dan 12 bulan Rp599.000. Harga ini adalah rekomendasi katalog, bukan harga modal supplier terverifikasi.
+- Produk dengan pilihan private/sharing dan variasi durasi diarahkan ke WhatsApp admin untuk memastikan tipe akses, stok, durasi, harga final, serta garansi sebelum pembayaran. Form order otomatis tidak digunakan untuk produk katalog variatif agar tidak menghitung harga yang belum dikonfirmasi.
+- Alamat usaha yang diminta untuk ditampilkan: Jalan Iman Bonjol No. 23, Tanjung Balai. Pastikan ejaan dan alamat ini sama persis dengan dokumen usaha serta data yang disampaikan ke iPaymu sebelum website dipublikasikan.
+- Target margin 20% belum dapat dihitung secara nyata karena harga modal supplier belum tersedia. Rumus harga jual untuk margin 20% dari harga jual adalah: harga modal / 0,80. Contoh: modal Rp80.000 -> harga jual minimum Rp100.000 (belum termasuk biaya pembayaran/pajak/operasional).
+- Data fitur produk ditulis berdasarkan fungsi layanan secara umum. Ketersediaan fitur, kualitas, jumlah perangkat, batas penggunaan, dan ketentuan dapat berubah mengikuti paket resmi, wilayah, dan jenis akses.
