@@ -1,30 +1,44 @@
-WENZZSTORE — KONFIRMASI ADMIN + iPaymu (Cloudflare Pages)
+WENZZSTORE — WEBSITE + ADMIN + IPAYMU (CLOUDFLARE PAGES)
 ========================================================
 Domain: https://wenzzstore.my.id
-Alur: pelanggan pesan -> admin cek stok/harga -> admin klik konfirmasi -> sistem membuat invoice iPaymu -> admin mengirim link melalui WhatsApp.
+Alur: pelanggan membuat pesanan -> admin memeriksa pesanan/stok -> admin menentukan harga final -> backend membuat invoice iPaymu -> admin mengirim link pembayaran via WhatsApp -> callback terverifikasi memperbarui status.
 
 ISI PAKET
-- index.html: katalog dan form pesanan; tidak langsung menagih.
-- admin.html: panel admin untuk memeriksa pesanan dan membuat tagihan.
-- payment-status.html, privacy.html, refund.html, terms.html.
-- functions/api/create-order.js: simpan pesanan WAITING_ADMIN.
-- functions/api/admin/orders.js: daftar pesanan, dilindungi ADMIN_TOKEN.
+- index.html: katalog, FAQ, dan formulir pesanan.
+- admin.html: panel admin untuk melihat pesanan dan membuat tagihan.
+- payment-status.html: halaman status pembayaran.
+- terms.html, refund.html, privacy.html: halaman kebijakan.
+- functions/api/create-order.js: menyimpan pesanan.
+- functions/api/admin/orders.js: daftar pesanan (wajib ADMIN_TOKEN).
 - functions/api/admin/confirm.js: membuat invoice iPaymu setelah persetujuan admin.
-- functions/api/ipaymu/callback.js: callback pembayaran.
-- functions/api/order-status.js: status pesanan.
+- functions/api/ipaymu/callback.js: menerima callback JSON/form-urlencoded, memvalidasi HMAC, mencocokkan nominal, dan memperbarui status secara idempotent.
+- functions/api/order-status.js: status pesanan untuk halaman pelanggan.
 
-SETUP CLOUDFLARE
-1. Deploy seluruh isi ZIP ke project Cloudflare Pages untuk wenzzstore.my.id.
-2. Buat KV Namespace bernama ORDERS.
-3. Pages > Settings > Functions > KV namespace bindings: Variable name ORDERS, pilih namespace tersebut.
-4. Pages > Settings > Variables and Secrets, tambahkan sebagai Secret: ADMIN_TOKEN (token acak panjang), IPAYMU_VA (VA merchant), IPAYMU_API_KEY (API Key). Tambahkan IPAYMU_ENV sebagai variable: sandbox untuk tes atau production setelah tes.
-5. Deploy ulang setelah binding dan secrets disimpan.
-6. Atur callback iPaymu ke https://wenzzstore.my.id/api/ipaymu/callback. Pastikan format signature callback sesuai dokumentasi resmi dan uji sandbox.
-7. Panel admin: https://wenzzstore.my.id/admin.html. Masukkan ADMIN_TOKEN. Jangan berikan token kepada pelanggan.
-8. Uji: pelanggan pesan -> pesanan muncul di admin -> admin isi harga final dan klik konfirmasi -> sistem membuat link iPaymu -> admin kirim ke WhatsApp -> callback memperbarui status. Jangan live sebelum callback sandbox tervalidasi.
+PENTING SEBELUM DEPLOY
+1. Buat KV Namespace di Cloudflare, misalnya bernama ORDERS.
+2. Di Cloudflare Pages > Settings > Functions > KV namespace bindings, buat binding Variable name: ORDERS dan pilih namespace yang dibuat.
+3. Di Settings > Variables and Secrets, tambahkan:
+   - ADMIN_TOKEN (Secret): buat token acak panjang dan rahasiakan.
+   - IPAYMU_VA (Secret): VA merchant.
+   - IPAYMU_API_KEY (Secret): API Key merchant.
+   - IPAYMU_ENV (Variable): sandbox untuk uji Sandbox atau production setelah akun disetujui.
+4. Deploy seluruh isi folder ini sebagai root project Pages. Jangan mengunggah folder induk yang membungkus file-file ini.
+5. File wrangler.toml berisi placeholder KV ID. Jika Anda menggunakan Dashboard binding seperti langkah 2, binding ORDERS di Dashboard yang dipakai. Jika deploy dengan Wrangler CLI, ganti placeholder id dengan ID KV Namespace Anda.
+6. Atur callback di dashboard iPaymu ke https://wenzzstore.my.id/api/ipaymu/callback. Pilih application/json bila tersedia; handler juga mendukung application/x-www-form-urlencoded.
+7. Panel admin ada di https://wenzzstore.my.id/admin.html. Masukkan ADMIN_TOKEN yang sama dengan Secret Cloudflare.
 
-HARGA KATALOG AWAL SERVER
-Telegram Premium Rp230.000; Netflix Premium Rp65.000; Spotify Premium Rp45.000; ChatGPT Premium Rp90.000 per item. Admin dapat mengganti harga final per item saat konfirmasi. X Premium masih melalui WhatsApp karena harga belum ditetapkan. Pastikan durasi/paket tiap harga jelas sebelum produksi.
+PENGUJIAN
+- Uji pembuatan pesanan dan kemunculannya di panel admin.
+- Uji konfirmasi admin dengan kredensial Sandbox.
+- Uji callback Sandbox asli dari iPaymu dan pastikan signature diterima serta nominal cocok.
+- Pastikan status berubah menjadi PAID hanya setelah callback valid.
+- Jangan gunakan Production sebelum iPaymu menyetujui akun dan pengujian Sandbox berhasil.
 
-KEAMANAN
-Jangan pernah memasukkan VA/API Key ke HTML atau browser. Callback saat ini fail-closed; validasi signature harus dicocokkan dengan payload callback aktual dari akun iPaymu sebelum produksi. KV cocok untuk volume ringan; untuk skala besar gunakan database dan autentikasi admin yang lebih kuat.
+KEAMANAN DAN BATASAN
+- Jangan pernah memasukkan VA, API Key, atau ADMIN_TOKEN ke HTML, JavaScript browser, atau repository publik.
+- Callback menolak signature yang tidak valid dan menolak nominal yang tidak sama dengan total order.
+- KV tidak menyediakan transaksi/lock atomik untuk mencegah dua permintaan admin bersamaan. Untuk volume besar atau kebutuhan konkurensi ketat, pindahkan order ke database dengan operasi atomik.
+- Pastikan harga katalog, durasi paket, hak distribusi, dan ketentuan layanan tiap produk benar sebelum menerima pembayaran.
+
+KATALOG SERVER SAAT INI
+Telegram Premium Rp230.000; Netflix Premium Rp65.000; Spotify Premium Rp45.000; ChatGPT Premium Rp90.000 per item. X Premium masih diarahkan ke admin karena harga belum ditetapkan.

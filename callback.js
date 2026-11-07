@@ -3,42 +3,86 @@ async function hmacHex(secret, message) {
   const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
   return [...new Uint8Array(signature)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
-function stable(value) {
-  if (Array.isArray(value)) return value.map(stable);
-  if (value && typeof value === 'object') return Object.keys(value).sort().reduce((out, key) => { out[key] = stable(value[key]); return out; }, {});
+
+function sortObject(value) {
+  if (Array.isArray(value)) return value.map(sortObject);
+  if (value && typeof value === 'object') {
+    return Object.keys(value).sort().reduce((out, key) => { out[key] = sortObject(value[key]); return out; }, {});
+  }
   return value;
 }
+
+function parseForm(raw) {
+  const params = new URLSearchParams(raw);
+  const payload = {};
+  for (const [key, value] of params.entries()) payload[key] = value;
+  for (const key of ['trx_id', 'status_code', 'transaction_status_code', 'paid_off']) {
+    if (payload[key] !== undefined && /^-?\d+$/.test(payload[key])) payload[key] = Number.parseInt(payload[key], 10);
+  }
+  if (payload.is_escrow !== undefined) payload.is_escrow = payload.is_escrow === 'true' || payload.is_escrow === '1';
+  if (payload.additional_info === '[]') payload.additional_info = [];
+  else if (payload.additional_info !== undefined) {
+    try { payload.additional_info = JSON.parse(payload.additional_info); } catch { /* retain provider value for signature validation */ }
+  } else payload.additional_info = [];
+  return payload;
+}
+
+function jsonResponse(message, status) {
+  return new Response(message, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+}
+
 export async function onRequestPost({ request, env }) {
-  if (!env.IPAYMU_VA || !env.ORDERS) return new Response('Not configured', { status: 503 });
+  if (!env.IPAYMU_VA || !env.ORDERS) return jsonResponse('Not configured', 503);
   try {
     const raw = await request.text();
-    const payload = JSON.parse(raw);
+    const contentType = (request.headers.get('Content-Type') || '').toLowerCase();
+    let payload;
+    if (contentType.includes('application/json')) payload = JSON.parse(raw);
+    else if (contentType.includes('application/x-www-form-urlencoded')) payload = parseForm(raw);
+    else return jsonResponse('Unsupported content type', 415);
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return jsonResponse('Invalid payload', 400);
+
     const received = request.headers.get('X-Signature') || payload.signature;
-    if (!received) return new Response('Missing signature', { status: 401 });
+    if (typeof received !== 'string' || !/^[a-f0-9]{64}$/i.test(received)) return jsonResponse('Missing or invalid signature', 401);
     const data = { ...payload };
     delete data.signature;
-    const expected = await hmacHex(env.IPAYMU_VA, JSON.stringify(stable(data)));
-    if (received.toLowerCase() !== expected.toLowerCase()) return new Response('Invalid signature', { status: 401 });
+    if (!Object.prototype.hasOwnProperty.call(data, 'additional_info') && !contentType.includes('application/json')) data.additional_info = [];
+    let canonical = JSON.stringify(sortObject(data));
+    canonical = canonical.replace(/\//g, '\\/');
+    const expected = await hmacHex(env.IPAYMU_VA, canonical);
+    if (received.toLowerCase() !== expected.toLowerCase()) return jsonResponse('Invalid signature', 401);
+
     const ref = String(payload.reference_id || payload.referenceId || '');
-    if (!ref) return new Response('Missing reference', { status: 400 });
+    if (!/^WZ[A-Z0-9]+$/.test(ref)) return jsonResponse('Invalid reference', 400);
     const stored = await env.ORDERS.get(ref);
-    if (!stored) return new Response('Order not found', { status: 404 });
+    if (!stored) return jsonResponse('Order not found', 404);
     const order = JSON.parse(stored);
-    if (order.status === 'PAID') return new Response('OK', { status: 200 });
-    const status = String(payload.status || '').toLowerCase();
+    if (order.status === 'PAID') return jsonResponse('OK', 200);
+
     const statusCode = Number(payload.status_code);
-    const transactionCode = Number(payload.transaction_status_code);
-    if (status === 'berhasil' || status === 'success' || statusCode === 1 || transactionCode === 1 || transactionCode === 6) {
+    const status = String(payload.status || '').toLowerCase();
+    const isSuccess = statusCode === 1 || status === 'berhasil' || status === 'success';
+    const isFailure = statusCode === -2 || status === 'expired' || status === 'gagal' || status === 'failed';
+    if (isSuccess) {
+      const amountRaw = payload.total ?? payload.amount;
+      const amount = Number(amountRaw);
+      if (!Number.isSafeInteger(amount) || amount !== Number(order.total)) {
+        console.error('iPaymu callback amount mismatch', { referenceId: ref });
+        return jsonResponse('Amount mismatch', 400);
+      }
       order.status = 'PAID';
       order.paidAt = new Date().toISOString();
-      order.ipaymuTransactionId = payload.trx_id || null;
-    } else if (status === 'gagal' || status === 'failed' || status === 'expired' || statusCode < 0) {
+      order.ipaymuTransactionId = payload.trx_id == null ? null : String(payload.trx_id);
+      order.paymentChannel = payload.channel || payload.via || null;
+    } else if (isFailure) {
       order.status = 'FAILED';
+      order.failedAt = new Date().toISOString();
     }
+    order.lastCallbackAt = new Date().toISOString();
     await env.ORDERS.put(ref, JSON.stringify(order), { expirationTtl: 60 * 60 * 24 * 30 });
-    return new Response('OK', { status: 200 });
+    return jsonResponse('OK', 200);
   } catch (error) {
     console.error('ipaymu callback error', error);
-    return new Response('Invalid callback', { status: 400 });
+    return jsonResponse('Invalid callback', 400);
   }
 }
