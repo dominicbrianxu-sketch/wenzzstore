@@ -54,3 +54,19 @@ PEMBARUAN KATALOG WENZZSTORE
 - Alamat usaha yang diminta untuk ditampilkan: Jalan Iman Bonjol No. 23, Tanjung Balai. Pastikan ejaan dan alamat ini sama persis dengan dokumen usaha serta data yang disampaikan ke iPaymu sebelum website dipublikasikan.
 - Target margin 20% belum dapat dihitung secara nyata karena harga modal supplier belum tersedia. Rumus harga jual untuk margin 20% dari harga jual adalah: harga modal / 0,80. Contoh: modal Rp80.000 -> harga jual minimum Rp100.000 (belum termasuk biaya pembayaran/pajak/operasional).
 - Data fitur produk ditulis berdasarkan fungsi layanan secara umum. Ketersediaan fitur, kualitas, jumlah perangkat, batas penggunaan, dan ketentuan dapat berubah mengikuti paket resmi, wilayah, dan jenis akses.
+
+
+PEMBARUAN KATALOG & DEPLOYMENT
+- Upload ISI folder wenzz_final ke ROOT repository GitHub, bukan folder wenzz_final sebagai subfolder. Root harus berisi index.html, admin.html, wrangler.toml, dan folder functions/.
+- Pastikan Cloudflare Pages Build output directory = . dan root directory kosong. Deployment harus mendeteksi /functions.
+- Form checkout kini meminta jenis akses (Private/Sharing/Voucher-Aktivasi), durasi, dan data pelanggan. Semua 10 produk dikenali backend.
+- Harga awal yang dipakai adalah harga mulai yang diberikan pemilik toko. Selain Telegram Premium, durasi tambahan belum diberi harga otomatis karena modal dan harga supplier per varian belum tersedia. Admin wajib menetapkan harga final sebelum membuat tagihan iPaymu.
+- Telegram Premium memuat usulan katalog 3/6/12 bulan; harga jual ini adalah rekomendasi toko, bukan harga resmi Telegram.
+- Jangan mengaktifkan Production sebelum KV ORDERS, Secrets IPAYMU_VA/IPAYMU_API_KEY/ADMIN_TOKEN, callback, dan transaksi Sandbox berhasil diuji.
+
+
+PEMBARUAN PILIHAN PAKET
+- Checkout kini menampilkan daftar paket yang dapat dipilih satu per satu (radio/centang pilihan tunggal).
+- Harga ditampilkan hanya untuk varian yang sudah memiliki harga acuan; varian lain tertulis 'Harga final dikonfirmasi admin' agar tidak mengarang harga supplier.
+- Backend menyimpan label paket, durasi, jenis akses, dan harga referensi. Admin tetap menetapkan harga final sebelum membuat invoice.
+- Harga mulai dari pemilik toko bukan otomatis harga resmi brand. Periksa harga supplier dan hak distribusi sebelum mengubah harga final.
