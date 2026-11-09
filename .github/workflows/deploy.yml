@@ -2,14 +2,22 @@
 name: Deploy WENZZSTORE to Cloudflare Pages
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wenzzstore-cloudflare-production
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -20,38 +28,97 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract website package
+      - name: Verify deployment ZIP exists
+        shell: bash
         run: |
+          set -euo pipefail
+
+          test -f WENZZSTORE-WEBSITE-DEPLOY.zip || {
+            echo "ERROR: WENZZSTORE-WEBSITE-DEPLOY.zip tidak ditemukan di root repository."
+            exit 1
+          }
+
+      - name: Extract website and Pages Functions
+        shell: bash
+        run: |
+          set -euo pipefail
+
           rm -rf package dist functions
           mkdir -p package dist
 
-          unzip -o WENZZSTORE-WEBSITE-DEPLOY.zip -d package
+          unzip -q WENZZSTORE-WEBSITE-DEPLOY.zip -d package
 
+          # Salin seluruh file website ke folder dist.
           cp -a package/. dist/
 
-          if [ ! -d package/functions ]; then
-            echo "ERROR: Folder functions tidak ditemukan dalam ZIP"
+          # Pastikan folder Functions tersedia.
+          test -d package/functions || {
+            echo "ERROR: Folder functions/ tidak ditemukan pada ZIP."
+            find package -maxdepth 4 -type f -print
             exit 1
-          fi
+          }
 
+          # Pages Functions harus berada di root proyek.
           cp -a package/functions ./functions
 
+          # Jangan masukkan Functions sebagai aset statis.
           rm -rf dist/functions
-          rm -f dist/wrangler.toml
-          rm -f wrangler.toml
 
-      - name: Verify Pages Functions
+          # Hapus konfigurasi Wrangler placeholder.
+          rm -f wrangler.toml dist/wrangler.toml
+
+      - name: Verify Pages files and Functions structure
+        shell: bash
         run: |
+          set -euo pipefail
+
+          # Periksa file website.
+          test -f dist/index.html
+          test -f dist/admin.html
+          test -f dist/terms.html
+          test -f dist/privacy.html
+          test -f dist/payment-status.html
+
+          # Periksa semua file API.
           test -f functions/api/create-order.js
+          test -f functions/api/order-status.js
           test -f functions/api/admin/orders.js
+          test -f functions/api/admin/confirm.js
           test -f functions/api/ipaymu/callback.js
-          echo "Functions structure OK"
+
+          echo "=================================="
+          echo "WEBSITE FILES:"
+          echo "=================================="
+          find dist -maxdepth 2 -type f -print | sort
+
+          echo "=================================="
+          echo "CLOUDFLARE PAGES FUNCTIONS:"
+          echo "=================================="
+          find functions -type f -print | sort
+
+          echo "=================================="
+          echo "VERIFIKASI BERHASIL"
+          echo "=================================="
 
       - name: Deploy to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
         run: |
-          npx wrangler@4 pages deploy dist \
+          set -euo pipefail
+
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || {
+            echo "ERROR: GitHub Secret CLOUDFLARE_API_TOKEN belum tersedia."
+            exit 1
+          }
+
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || {
+            echo "ERROR: GitHub Secret CLOUDFLARE_ACCOUNT_ID belum tersedia."
+            exit 1
+          }
+
+          npx --yes wrangler@4 pages deploy dist \
             --project-name=wenzzstoree \
-            --branch=main
+            --branch=main \
+            --commit-dirty=true
