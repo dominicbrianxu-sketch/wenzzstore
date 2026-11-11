@@ -74,3 +74,13 @@ PEMBARUAN PILIHAN PAKET
 PANDUAN SETUP LENGKAP
 Lihat file CLOUDFLARE_SETUP_ID.txt untuk urutan deploy, membuat KV, menambahkan secrets, mendaftarkan callback, menguji Sandbox, dan mengaktifkan Production.
 IPAYMU_ENV sekarang wajib diisi persis 'sandbox' atau 'production'. Nilai kosong/salah akan ditolak; sistem tidak akan diam-diam mengarah ke Production.
+
+
+PEMBAYARAN OTOMATIS iPaymu
+- Produk/paket yang memiliki harga tetap di katalog dapat langsung checkout.
+- Paket yang belum memiliki harga tidak ditampilkan sebagai opsi checkout.
+- Server memvalidasi harga dari katalog sendiri; harga dari browser tidak dipercaya.
+- Setelah pelanggan checkout, sistem langsung membuat tagihan iPaymu dan mengarahkan pelanggan ke halaman pembayaran.
+- Status pembayaran diperbarui oleh callback iPaymu.
+- Cloudflare Pages secrets/variables yang diperlukan: IPAYMU_VA, IPAYMU_API_KEY, IPAYMU_ENV (sandbox atau production), ADMIN_TOKEN; KV binding harus bernama ORDERS.
+- Uji terlebih dahulu dengan IPAYMU_ENV=sandbox sebelum production.
