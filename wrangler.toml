@@ -1,7 +1,0 @@
-name = "wenzzstore"
-compatibility_date = "2026-11-07"
-pages_build_output_dir = "."
-
-[[kv_namespaces]]
-binding = "ORDERS"
-id = "REPLACE_WITH_YOUR_CLOUDFLARE_KV_NAMESPACE_ID"
