@@ -15,15 +15,15 @@ ISI PAKET
 - functions/api/order-status.js: status pesanan untuk halaman pelanggan.
 
 PENTING SEBELUM DEPLOY
-1. Buat KV Namespace di Cloudflare, misalnya bernama ORDERS.
-2. Di Cloudflare Pages > Settings > Functions > KV namespace bindings, buat binding Variable name: ORDERS dan pilih namespace yang dibuat.
+1. Buat KV Namespace di Cloudflare, misalnya bernama WENZZSTORE_ORDERS.
+2. Di Cloudflare Pages > Settings > Bindings, buat binding Variable name: ORDERS dan pilih namespace yang dibuat.
 3. Di Settings > Variables and Secrets, tambahkan:
    - ADMIN_TOKEN (Secret): buat token acak panjang dan rahasiakan.
    - IPAYMU_VA (Secret): VA merchant.
    - IPAYMU_API_KEY (Secret): API Key merchant.
    - IPAYMU_ENV (Variable): sandbox untuk uji Sandbox atau production setelah akun disetujui.
 4. Deploy seluruh isi folder ini sebagai root project Pages. Jangan mengunggah folder induk yang membungkus file-file ini.
-5. File wrangler.toml berisi placeholder KV ID. Jika Anda menggunakan Dashboard binding seperti langkah 2, binding ORDERS di Dashboard yang dipakai. Jika deploy dengan Wrangler CLI, ganti placeholder id dengan ID KV Namespace Anda.
+5. Untuk deployment melalui Git integration + Cloudflare Dashboard, tidak perlu mengisi file wrangler.toml. Atur KV binding langsung dari Settings > Bindings sesuai panduan CLOUDFLARE_SETUP_ID.txt.
 6. Atur callback di dashboard iPaymu ke https://wenzzstore.my.id/api/ipaymu/callback. Pilih application/json bila tersedia; handler juga mendukung application/x-www-form-urlencoded.
 7. Panel admin ada di https://wenzzstore.my.id/admin.html. Masukkan ADMIN_TOKEN yang sama dengan Secret Cloudflare.
 
@@ -70,3 +70,7 @@ PEMBARUAN PILIHAN PAKET
 - Harga ditampilkan hanya untuk varian yang sudah memiliki harga acuan; varian lain tertulis 'Harga final dikonfirmasi admin' agar tidak mengarang harga supplier.
 - Backend menyimpan label paket, durasi, jenis akses, dan harga referensi. Admin tetap menetapkan harga final sebelum membuat invoice.
 - Harga mulai dari pemilik toko bukan otomatis harga resmi brand. Periksa harga supplier dan hak distribusi sebelum mengubah harga final.
+
+PANDUAN SETUP LENGKAP
+Lihat file CLOUDFLARE_SETUP_ID.txt untuk urutan deploy, membuat KV, menambahkan secrets, mendaftarkan callback, menguji Sandbox, dan mengaktifkan Production.
+IPAYMU_ENV sekarang wajib diisi persis 'sandbox' atau 'production'. Nilai kosong/salah akan ditolak; sistem tidak akan diam-diam mengarah ke Production.

@@ -1,0 +1,89 @@
+PANDUAN DEPLOY WENZZSTORE + IPAYMU DI CLOUDFLARE PAGES
+======================================================
+
+Paket ini memakai Cloudflare Pages Functions (folder /functions). Jangan mengunggah hanya file HTML; folder functions harus ikut berada di root project.
+
+A. DEPLOY WEBSITE
+1. Simpan ZIP ini, ekstrak seluruh isinya.
+2. Pastikan struktur root langsung berisi index.html, admin.html, payment-status.html, dan folder functions/.
+3. Jika project terhubung ke GitHub: unggah seluruh isi hasil ekstrak ke ROOT repository (bukan folder ZIP di dalam folder lain), lalu commit/push.
+4. Cloudflare Dashboard > Workers & Pages > pilih project WENZZSTORE > Settings > Builds & deployments.
+5. Framework preset: None (jika diminta). Build command: kosong / none. Build output directory: . (titik). Root directory: / (kosong/root).
+6. Simpan dan jalankan deployment. Pastikan deployment selesai tanpa error.
+
+Catatan: Pages Functions berjalan dari folder /functions di root source. Jangan mengubah folder functions menjadi assets/functions atau memindahkannya ke subfolder.
+
+B. BUAT STORAGE ORDER (KV)
+1. Cloudflare Dashboard > Storage & databases > KV.
+2. Create namespace, beri nama misalnya WENZZSTORE_ORDERS.
+3. Kembali ke Workers & Pages > project WENZZSTORE > Settings > Bindings.
+4. Add binding > KV namespace.
+5. Variable name harus persis: ORDERS
+6. Pilih namespace WENZZSTORE_ORDERS yang dibuat tadi.
+7. Save, lalu redeploy project agar binding aktif.
+
+C. TAMBAHKAN VARIABLES & SECRETS
+Buka project > Settings > Variables and Secrets (atau Settings > Environment variables, tergantung tampilan dashboard). Tambahkan untuk Production:
+
+Secret: ADMIN_TOKEN
+- Buat token acak panjang minimal 32 karakter. Contoh pembuatan: password manager / generator acak.
+- Jangan gunakan contoh token dari internet dan jangan masukkan token ke file HTML atau repository.
+
+Secret: IPAYMU_VA
+- Isi VA untuk environment yang dipakai. Simpan sebagai Secret.
+
+Secret: IPAYMU_API_KEY
+- Isi API Key untuk environment yang dipakai. Simpan sebagai Secret.
+
+Variable (teks): IPAYMU_ENV
+- Isi sandbox untuk pengujian Sandbox.
+- Ubah menjadi production hanya setelah akun iPaymu aktif dan seluruh tes Sandbox lolos.
+
+Jika memakai Preview deployments, buat binding ORDERS dan variables/secrets terpisah di lingkungan Preview bila Preview akan dipakai untuk tes. Kredensial Sandbox jangan dicampur dengan Production.
+
+Setelah menambah atau mengubah binding/secret/variable, lakukan redeploy agar perubahan dipakai oleh Functions.
+
+D. DAFTARKAN CALLBACK DI DASHBOARD IPAYMU
+Callback URL:
+https://wenzzstore.my.id/api/ipaymu/callback
+
+Pilih Content-Type application/x-www-form-urlencoded (default/rekomendasi iPaymu) atau application/json. Handler mendukung keduanya.
+Daftarkan URL pada lingkungan Sandbox terlebih dahulu. Jika dashboard menyediakan pengaturan callback terpisah untuk Sandbox dan Production, masukkan URL yang sesuai pada masing-masing lingkungan.
+
+E. TES SANDBOX (WAJIB SEBELUM LIVE)
+1. Pastikan IPAYMU_ENV=sandbox dan IPAYMU_VA/API_KEY adalah kredensial Sandbox.
+2. Buka https://wenzzstore.my.id lalu kirim pesanan percobaan.
+3. Buka https://wenzzstore.my.id/admin.html dan masukkan ADMIN_TOKEN.
+4. Pastikan pesanan terlihat. Admin memeriksa produk, varian, akses, durasi, stok, dan harga sebelum memasukkan harga final.
+5. Klik Konfirmasi & Buat Tagihan iPaymu. Pastikan link checkout Sandbox berhasil dibuat.
+6. Selesaikan transaksi uji sesuai metode yang disediakan iPaymu Sandbox.
+7. Pastikan callback diterima dan halaman status menunjukkan PAID. Jangan mengubah status secara manual untuk menganggap tes berhasil.
+8. Uji juga transaksi gagal/kedaluwarsa dan pastikan tidak berubah menjadi PAID.
+
+F. AKTIFKAN PRODUCTION
+Hanya setelah iPaymu mengaktifkan akun Production dan mengonfirmasi domain/IP sesuai ketentuan mereka:
+1. Ganti IPAYMU_ENV menjadi production.
+2. Ganti IPAYMU_VA dan IPAYMU_API_KEY dengan kredensial Production (jangan memakai kredensial Sandbox).
+3. Pastikan callback Production terdaftar.
+4. Redeploy dan lakukan transaksi live bernilai kecil yang memang Anda izinkan.
+
+PENTING TENTANG CLOUDFLARE DAN IP STATIS
+Cloudflare Pages Functions berjalan di jaringan edge Cloudflare; jangan menganggap egress IP-nya statis. Dokumentasi iPaymu menyebut Production memerlukan IP statis dan domain terdaftar. Sebelum live, minta iPaymu memastikan secara tertulis bahwa domain WENZZSTORE dan model hosting Cloudflare Pages Anda diterima, atau tanyakan apakah diperlukan backend/proxy dengan IP statis. Jangan mengaktifkan Production jika persyaratan IP mereka belum terpenuhi.
+
+KEAMANAN
+- Jangan kirim VA, API Key, ADMIN_TOKEN, atau screenshot yang menampilkan kredensial ke chat publik.
+- Jangan pernah menaruh kredensial di index.html/admin.html atau JavaScript browser.
+- Status PAID hanya boleh ditetapkan oleh callback yang signature-nya valid dan nominalnya cocok.
+- Admin panel menggunakan token Bearer. Batasi akses token dan ganti token segera jika bocor.
+- KV bukan database transaksional; hindari menekan tombol pembuatan invoice berulang kali. Untuk volume besar/konkurensi tinggi, pindahkan order ke database dengan transaksi/locking.
+
+KETERANGAN STATUS
+WAITING_ADMIN = menunggu admin memeriksa dan menetapkan harga.
+AWAITING_PAYMENT = invoice iPaymu berhasil dibuat, menunggu pembayaran.
+PAID = callback valid diterima dan nominal cocok.
+FAILED = callback valid menyatakan transaksi gagal/kedaluwarsa.
+
+DOKUMENTASI RESMI
+- https://docs.ipaymu.com/id/docs/payment/redirect-payment
+- https://docs.ipaymu.com/id/docs/callback
+- https://developers.cloudflare.com/pages/functions/bindings/

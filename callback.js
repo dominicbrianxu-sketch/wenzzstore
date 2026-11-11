@@ -12,19 +12,33 @@ function sortObject(value) {
   return value;
 }
 
+function normalizePayload(payload) {
+  const normalized = { ...payload };
+  for (const key of ['trx_id', 'status_code', 'transaction_status_code', 'paid_off']) {
+    if (normalized[key] !== undefined && normalized[key] !== null && /^-?\d+$/.test(String(normalized[key]))) {
+      normalized[key] = Number.parseInt(normalized[key], 10);
+    }
+  }
+  if (normalized.is_escrow !== undefined) {
+    normalized.is_escrow = normalized.is_escrow === true || normalized.is_escrow === 'true' || normalized.is_escrow === '1' || normalized.is_escrow === 1;
+  }
+  if (normalized.additional_info === '[]') normalized.additional_info = [];
+  else if (normalized.additional_info === undefined) normalized.additional_info = [];
+  return normalized;
+}
+
 function parseForm(raw) {
   const params = new URLSearchParams(raw);
   const payload = {};
   for (const [key, value] of params.entries()) payload[key] = value;
-  for (const key of ['trx_id', 'status_code', 'transaction_status_code', 'paid_off']) {
-    if (payload[key] !== undefined && /^-?\d+$/.test(payload[key])) payload[key] = Number.parseInt(payload[key], 10);
-  }
-  if (payload.is_escrow !== undefined) payload.is_escrow = payload.is_escrow === 'true' || payload.is_escrow === '1';
-  if (payload.additional_info === '[]') payload.additional_info = [];
-  else if (payload.additional_info !== undefined) {
-    try { payload.additional_info = JSON.parse(payload.additional_info); } catch { /* retain provider value for signature validation */ }
-  } else payload.additional_info = [];
-  return payload;
+  return normalizePayload(payload);
+}
+
+function safeEqualHex(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
 }
 
 function jsonResponse(message, status) {
@@ -37,7 +51,7 @@ export async function onRequestPost({ request, env }) {
     const raw = await request.text();
     const contentType = (request.headers.get('Content-Type') || '').toLowerCase();
     let payload;
-    if (contentType.includes('application/json')) payload = JSON.parse(raw);
+    if (contentType.includes('application/json')) payload = normalizePayload(JSON.parse(raw));
     else if (contentType.includes('application/x-www-form-urlencoded')) payload = parseForm(raw);
     else return jsonResponse('Unsupported content type', 415);
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return jsonResponse('Invalid payload', 400);
@@ -46,11 +60,10 @@ export async function onRequestPost({ request, env }) {
     if (typeof received !== 'string' || !/^[a-f0-9]{64}$/i.test(received)) return jsonResponse('Missing or invalid signature', 401);
     const data = { ...payload };
     delete data.signature;
-    if (!Object.prototype.hasOwnProperty.call(data, 'additional_info') && !contentType.includes('application/json')) data.additional_info = [];
     let canonical = JSON.stringify(sortObject(data));
     canonical = canonical.replace(/\//g, '\\/');
     const expected = await hmacHex(env.IPAYMU_VA, canonical);
-    if (received.toLowerCase() !== expected.toLowerCase()) return jsonResponse('Invalid signature', 401);
+    if (!safeEqualHex(received.toLowerCase(), expected.toLowerCase())) return jsonResponse('Invalid signature', 401);
 
     const ref = String(payload.reference_id || payload.referenceId || '');
     if (!/^WZ[A-Z0-9]+$/.test(ref)) return jsonResponse('Invalid reference', 400);
