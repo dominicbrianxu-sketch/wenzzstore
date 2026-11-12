@@ -47,9 +47,9 @@ export async function onRequestPost({ request, env }) {
     };
     const bodyText = JSON.stringify(body);
     const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
-    const signature = await hmacHex(env.IPAYMU_API_KEY, `POST:${env.IPAYMU_VA}:${await sha256Hex(bodyText)}:${env.IPAYMU_API_KEY}`);
+    const signature = await hmacHex(String(env.IPAYMU_API_KEY).trim(), `POST:${String(env.IPAYMU_VA).trim()}:${await sha256Hex(bodyText)}:${String(env.IPAYMU_API_KEY).trim()}`);
     const api = environment === 'sandbox' ? 'https://sandbox.ipaymu.com/api/v2' : 'https://my.ipaymu.com/api/v2';
-    const res = await fetch(`${api}/payment`, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', va: env.IPAYMU_VA, signature, timestamp }, body: bodyText });
+    const res = await fetch(`${api}/payment`, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', va: String(env.IPAYMU_VA).trim(), signature, timestamp }, body: bodyText });
     let data = null; try { data = JSON.parse(await res.text()); } catch { /* bukan JSON */ }
     const url = data?.Data?.Url;
     if (!res.ok || !data || data.Status !== 200 || typeof url !== 'string' || !/^https:\/\//i.test(url)) {
