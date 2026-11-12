@@ -1,5 +1,7 @@
-// WENZZSTORE - Automatic iPaymu checkout (Cloudflare Pages Function)
-// Server-side prices are authoritative; browser-supplied prices are never trusted.
+// WENZZSTORE - Checkout otomatis iPaymu (Cloudflare Pages Function)
+// Harga dihitung di server. Harga dari browser tidak pernah dipercaya.
+// SEMUA respons dari endpoint ini selalu JSON (tidak pernah HTML).
+
 const CATALOG = {
   'Telegram Premium': [
     { label: 'Telegram Premium Gift 3 bulan', duration: '3 bulan', price: 259000 },
@@ -17,6 +19,9 @@ const CATALOG = {
   'Disney+ Premium': [{ label: 'Paket 1 bulan — mulai', duration: '1 bulan', price: 70000 }]
 };
 const ACCESS_TYPES = ['Private', 'Sharing', 'Voucher/Aktivasi'];
+const ORDER_TTL = 60 * 60 * 24 * 30;
+const RATE_LIMIT_MAX = 8;       // maks. pesanan per IP
+const RATE_LIMIT_WINDOW = 600;  // dalam 10 menit
 
 async function sha256Hex(value) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
@@ -24,62 +29,100 @@ async function sha256Hex(value) {
 }
 async function hmacHex(secret, message) {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
-  return [...new Uint8Array(signature)].map(b => b.toString(16).padStart(2, '0')).join('');
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
+  return [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 function json(data, status = 200) {
-  return Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }
+  });
+}
+// ID baru selalu "lebih kecil" dari ID lama -> daftar KV (urut abjad) menampilkan pesanan TERBARU lebih dulu.
+function newOrderId() {
+  const reversed = String(9999999999999 - Date.now()).padStart(13, '0');
+  return `WZ${reversed}${crypto.randomUUID().replaceAll('-', '').slice(0, 8).toUpperCase()}`;
+}
+async function rateLimited(env, request) {
+  try {
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const key = `rl:${ip}`;
+    const count = Number(await env.ORDERS.get(key)) || 0;
+    if (count >= RATE_LIMIT_MAX) return true;
+    await env.ORDERS.put(key, String(count + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  } catch (e) { console.error('rate limit error', e); }
+  return false;
+}
+async function saveOrder(env, order) {
+  await env.ORDERS.put(order.orderId, JSON.stringify(order), { expirationTtl: ORDER_TTL });
 }
 
-// Safe diagnostic GET: does not create an order or call iPaymu.
-export async function onRequestGet() {
-  return json({ ok: true, endpoint: 'create-order', method: 'POST', message: 'Endpoint aktif. Gunakan POST untuk membuat pesanan.' });
+// Diagnostik aman: tidak membuat pesanan dan tidak memanggil iPaymu.
+export async function onRequestGet({ env }) {
+  const environment = String(env.IPAYMU_ENV || '').toLowerCase();
+  return json({
+    ok: true, endpoint: 'create-order', method: 'POST',
+    kvBound: !!env.ORDERS,
+    ipaymuConfigured: !!(env.IPAYMU_VA && env.IPAYMU_API_KEY && ['sandbox', 'production'].includes(environment)),
+    environment: environment || null
+  });
 }
 
 export async function onRequestPost({ request, env }) {
-  let orderId = null;
+  let order = null;
   try {
-    if (!env.ORDERS) return json({ error: 'Binding KV ORDERS belum dikonfigurasi.' }, 503);
+    if (!env.ORDERS) return json({ error: 'Server belum siap (KV ORDERS belum dikonfigurasi). Hubungi admin.' }, 503);
     const environment = String(env.IPAYMU_ENV || '').toLowerCase();
     if (!env.IPAYMU_VA || !env.IPAYMU_API_KEY || !['sandbox', 'production'].includes(environment)) {
-      return json({ error: 'Konfigurasi iPaymu belum lengkap. Periksa IPAYMU_VA, IPAYMU_API_KEY, dan IPAYMU_ENV.' }, 503);
+      return json({ error: 'Pembayaran belum aktif (konfigurasi iPaymu belum lengkap). Hubungi admin.' }, 503);
     }
-    const input = await request.json();
+
+    let input;
+    try { input = await request.json(); } catch { return json({ error: 'Format permintaan tidak valid.' }, 400); }
+    if (!input || typeof input !== 'object') return json({ error: 'Format permintaan tidak valid.' }, 400);
+    if (input.website) return json({ error: 'Permintaan ditolak.' }, 400); // honeypot anti-bot
+
     const product = String(input.product || '').trim();
     const packageLabel = String(input.packageLabel || '').trim();
     const duration = String(input.duration || '').trim();
     const accessType = String(input.accessType || '').trim();
     const qty = Number(input.qty);
     const name = String(input.name || '').trim();
-    const phone = String(input.phone || '').trim();
-    const email = String(input.email || '').trim();
-    const selected = CATALOG[product]?.find(p => p.label === packageLabel && p.duration === duration);
-    if (!selected) return json({ error: 'Paket tidak tersedia atau belum memiliki harga final. Pilih paket yang menampilkan harga.' }, 400);
-    if (input.packagePrice !== undefined && Number(input.packagePrice) !== selected.price) {
-      return json({ error: 'Harga paket tidak sesuai. Muat ulang halaman dan pilih paket kembali.' }, 409);
-    }
-    if (!ACCESS_TYPES.includes(accessType)) return json({ error: 'Jenis akses tidak valid.' }, 400);
-    if (!Number.isInteger(qty) || qty < 1 || qty > 10) return json({ error: 'Jumlah pesanan harus antara 1 sampai 10.' }, 400);
-    if (!name || name.length > 100) return json({ error: 'Nama lengkap wajib diisi (maksimal 100 karakter).' }, 400);
-    if (!/^[0-9+\- ]{8,20}$/.test(phone)) return json({ error: 'Nomor WhatsApp tidak valid.' }, 400);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 150) return json({ error: 'Alamat email tidak valid.' }, 400);
-    const total = selected.price * qty;
-    if (!Number.isSafeInteger(total) || total < 1000 || total > 100000000) return json({ error: 'Total pembayaran di luar batas yang diizinkan.' }, 400);
+    const phone = String(input.phone || '').replace(/[^0-9]/g, '');
+    const email = String(input.email || '').trim().toLowerCase();
 
-    orderId = `WZ${Date.now()}${crypto.randomUUID().replaceAll('-', '').slice(0, 8).toUpperCase()}`;
+    const selected = CATALOG[product]?.find(p => p.label === packageLabel && p.duration === duration);
+    if (!selected) return json({ error: 'Paket tidak tersedia. Muat ulang halaman lalu pilih paket kembali.' }, 400);
+    if (input.packagePrice !== undefined && Number(input.packagePrice) !== selected.price) {
+      return json({ error: 'Harga paket berubah. Muat ulang halaman lalu pilih paket kembali.' }, 409);
+    }
+    if (!ACCESS_TYPES.includes(accessType)) return json({ error: 'Pilih jenis akses terlebih dahulu.' }, 400);
+    if (!Number.isInteger(qty) || qty < 1 || qty > 10) return json({ error: 'Jumlah pesanan harus 1 sampai 10.' }, 400);
+    if (!name || name.length > 100) return json({ error: 'Nama lengkap wajib diisi (maks. 100 karakter).' }, 400);
+    if (phone.length < 8 || phone.length > 15) return json({ error: 'Nomor WhatsApp tidak valid.' }, 400);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 150) return json({ error: 'Alamat email tidak valid.' }, 400);
+
+    const total = selected.price * qty;
+    if (!Number.isSafeInteger(total) || total < 1000 || total > 100000000) return json({ error: 'Total pembayaran di luar batas.' }, 400);
+
+    if (await rateLimited(env, request)) return json({ error: 'Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.' }, 429);
+
+    const orderId = newOrderId();
     const origin = new URL(request.url).origin;
-    const order = {
+    order = {
       orderId, product, packageLabel, duration, accessTypeRequested: accessType, qty,
       unitPrice: selected.price, total, name, phone, email,
-      status: 'AWAITING_PAYMENT', paymentProvider: 'iPaymu', createdAt: new Date().toISOString()
+      status: 'CREATING_PAYMENT', paymentProvider: 'iPaymu', createdAt: new Date().toISOString()
     };
-    // Save first so callback can find the order if it arrives quickly.
-    await env.ORDERS.put(orderId, JSON.stringify(order), { expirationTtl: 2592000 });
+    // Simpan dulu agar callback yang datang cepat tetap menemukan pesanan.
+    await saveOrder(env, order);
 
     const body = {
       product: [`WENZZSTORE - ${product} - ${packageLabel}`],
-      qty: [String(qty)], price: [String(selected.price)],
-      description: [`Pesanan ${orderId}`], buyerName: name, buyerPhone: phone, buyerEmail: email,
+      qty: [String(qty)],
+      price: [String(selected.price)],
+      description: [`Pesanan ${orderId}`],
+      buyerName: name, buyerPhone: phone, buyerEmail: email,
       returnUrl: `${origin}/payment-status.html?ref=${encodeURIComponent(orderId)}`,
       notifyUrl: `${origin}/api/ipaymu/callback`,
       cancelUrl: `${origin}/payment-status.html?ref=${encodeURIComponent(orderId)}&cancel=1`,
@@ -90,49 +133,63 @@ export async function onRequestPost({ request, env }) {
     const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
     const signature = await hmacHex(env.IPAYMU_API_KEY, `POST:${env.IPAYMU_VA}:${bodyHash}:${env.IPAYMU_API_KEY}`);
     const apiBase = environment === 'sandbox' ? 'https://sandbox.ipaymu.com/api/v2' : 'https://my.ipaymu.com/api/v2';
-    const paymentResponse = await fetch(`${apiBase}/payment`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', va: env.IPAYMU_VA, signature, timestamp },
-      body: bodyText
-    });
-    let paymentData;
-    try { paymentData = await paymentResponse.json(); }
-    catch {
-      console.error('iPaymu returned non-JSON response', paymentResponse.status);
+
+    let paymentResponse, rawText;
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 20000);
+      paymentResponse = await fetch(`${apiBase}/payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json', va: env.IPAYMU_VA, signature, timestamp },
+        body: bodyText,
+        signal: ctrl.signal
+      });
+      rawText = await paymentResponse.text();
+      clearTimeout(timer);
+    } catch (e) {
+      console.error('iPaymu fetch failed', String(e));
       order.status = 'PAYMENT_CREATION_FAILED';
-      await env.ORDERS.put(orderId, JSON.stringify(order), { expirationTtl: 2592000 });
-      return json({ error: 'Respons iPaymu tidak dapat dibaca. Silakan hubungi admin.', referenceId: orderId }, 502);
+      order.paymentError = 'Tidak dapat terhubung ke iPaymu.';
+      await saveOrder(env, order);
+      return json({ error: 'Tidak dapat terhubung ke iPaymu. Coba lagi sebentar lagi.', referenceId: orderId }, 502);
     }
-    const paymentUrl = paymentData?.Data?.Url;
-    if (!paymentResponse.ok || paymentData?.Status !== 200 || typeof paymentUrl !== 'string' || !/^https:\/\//i.test(paymentUrl)) {
-      console.error('iPaymu payment creation failed', paymentResponse.status, paymentData?.Message || 'Unknown response');
+
+    let data = null;
+    try { data = JSON.parse(rawText); } catch { /* bukan JSON */ }
+    const paymentUrl = data?.Data?.Url;
+    if (!paymentResponse.ok || !data || data.Status !== 200 || typeof paymentUrl !== 'string' || !/^https:\/\//i.test(paymentUrl)) {
+      const reason = String(data?.Message || `HTTP ${paymentResponse.status}`).slice(0, 300);
+      console.error('iPaymu payment creation failed', paymentResponse.status, reason);
       order.status = 'PAYMENT_CREATION_FAILED';
-      order.paymentError = String(paymentData?.Message || 'iPaymu gagal membuat tagihan.').slice(0, 300);
-      await env.ORDERS.put(orderId, JSON.stringify(order), { expirationTtl: 2592000 });
-      return json({ error: 'iPaymu belum berhasil membuat tagihan. Periksa konfigurasi akun atau hubungi admin.', referenceId: orderId }, 502);
+      order.paymentError = reason;
+      await saveOrder(env, order);
+      const res = { error: 'iPaymu belum bisa membuat tagihan. Coba lagi atau hubungi admin.', referenceId: orderId };
+      if (environment === 'sandbox') res.detail = reason;
+      return json(res, 502);
     }
-    // Preserve a PAID state if callback has already arrived.
-    const latestRaw = await env.ORDERS.get(orderId);
-    const latest = latestRaw ? JSON.parse(latestRaw) : order;
+
+    // Jangan menimpa status PAID bila callback sudah masuk lebih dulu.
+    let latest = order;
+    try { const raw = await env.ORDERS.get(orderId); if (raw) latest = JSON.parse(raw); } catch { /* pakai order lokal */ }
     latest.paymentUrl = paymentUrl;
     latest.paymentCreatedAt = new Date().toISOString();
     if (latest.status !== 'PAID') latest.status = 'AWAITING_PAYMENT';
-    await env.ORDERS.put(orderId, JSON.stringify(latest), { expirationTtl: 2592000 });
+    await saveOrder(env, latest);
     return json({ ok: true, referenceId: orderId, total, paymentUrl });
   } catch (error) {
     console.error('WENZZSTORE create-order error', error);
-    if (orderId && env.ORDERS) {
-      try {
-        const raw = await env.ORDERS.get(orderId);
-        if (raw) {
-          const order = JSON.parse(raw);
-          if (order.status !== 'PAID') {
-            order.status = 'PAYMENT_CREATION_FAILED';
-            await env.ORDERS.put(orderId, JSON.stringify(order), { expirationTtl: 2592000 });
-          }
-        }
-      } catch (storageError) { console.error('Could not update failed order', storageError); }
-    }
-    return json({ error: 'Terjadi kesalahan saat membuat pesanan atau tagihan. Silakan coba kembali.' }, 500);
+    try {
+      if (order && env.ORDERS) {
+        const raw = await env.ORDERS.get(order.orderId);
+        const cur = raw ? JSON.parse(raw) : order;
+        if (cur.status !== 'PAID') { cur.status = 'PAYMENT_CREATION_FAILED'; await saveOrder(env, cur); }
+      }
+    } catch (e) { console.error('could not mark failed', e); }
+    return json({ error: 'Terjadi kesalahan di server. Silakan coba lagi.' }, 500);
   }
+}
+
+// Method lain -> JSON, bukan HTML.
+export async function onRequest() {
+  return json({ error: 'Method tidak didukung.' }, 405);
 }
