@@ -59,12 +59,19 @@ async function saveOrder(env, order) {
 
 // Diagnostik aman: tidak membuat pesanan dan tidak memanggil iPaymu.
 export async function onRequestGet({ env }) {
-  const environment = String(env.IPAYMU_ENV || '').toLowerCase();
+  const environment = String(env.IPAYMU_ENV || '').trim().toLowerCase();
+  const va = String(env.IPAYMU_VA || '').trim();
+  const key = String(env.IPAYMU_API_KEY || '').trim();
   return json({
     ok: true, endpoint: 'create-order', method: 'POST',
     kvBound: !!env.ORDERS,
-    ipaymuConfigured: !!(env.IPAYMU_VA && env.IPAYMU_API_KEY && ['sandbox', 'production'].includes(environment)),
-    environment: environment || null
+    ipaymuConfigured: !!(va && key && ['sandbox', 'production'].includes(environment)),
+    environment: environment || null,
+    // Untuk mencocokkan dengan dashboard iPaymu (aman: hanya 4 digit akhir VA & panjang karakter)
+    vaLast4: va ? va.slice(-4) : null,
+    vaLength: va.length,
+    apiKeyLength: key.length,
+    hadWhitespace: va !== String(env.IPAYMU_VA || '') || key !== String(env.IPAYMU_API_KEY || '')
   });
 }
 
@@ -72,8 +79,10 @@ export async function onRequestPost({ request, env }) {
   let order = null;
   try {
     if (!env.ORDERS) return json({ error: 'Server belum siap (KV ORDERS belum dikonfigurasi). Hubungi admin.' }, 503);
-    const environment = String(env.IPAYMU_ENV || '').toLowerCase();
-    if (!env.IPAYMU_VA || !env.IPAYMU_API_KEY || !['sandbox', 'production'].includes(environment)) {
+    const environment = String(env.IPAYMU_ENV || '').trim().toLowerCase();
+    const VA = String(env.IPAYMU_VA || '').trim();          // trim: hilangkan spasi/baris baru yang ikut tersalin
+    const API_KEY = String(env.IPAYMU_API_KEY || '').trim();
+    if (!VA || !API_KEY || !['sandbox', 'production'].includes(environment)) {
       return json({ error: 'Pembayaran belum aktif (konfigurasi iPaymu belum lengkap). Hubungi admin.' }, 503);
     }
 
@@ -131,7 +140,7 @@ export async function onRequestPost({ request, env }) {
     const bodyText = JSON.stringify(body);
     const bodyHash = await sha256Hex(bodyText);
     const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
-    const signature = await hmacHex(env.IPAYMU_API_KEY, `POST:${env.IPAYMU_VA}:${bodyHash}:${env.IPAYMU_API_KEY}`);
+    const signature = await hmacHex(API_KEY, `POST:${VA}:${bodyHash}:${API_KEY}`);
     const apiBase = environment === 'sandbox' ? 'https://sandbox.ipaymu.com/api/v2' : 'https://my.ipaymu.com/api/v2';
 
     let paymentResponse, rawText;
@@ -140,7 +149,7 @@ export async function onRequestPost({ request, env }) {
       const timer = setTimeout(() => ctrl.abort(), 20000);
       paymentResponse = await fetch(`${apiBase}/payment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json', va: env.IPAYMU_VA, signature, timestamp },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json', va: VA, signature, timestamp },
         body: bodyText,
         signal: ctrl.signal
       });
