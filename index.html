@@ -90,7 +90,7 @@ const button=document.getElementById('payButton');button.disabled=true;button.te
 try{const payload={product:selectedProduct,packageLabel:selectedPackage.label,duration:selectedPackage.duration,packagePrice:selectedPackage.price,accessType:accessSelect.value,qty:Number(qtyInput.value),name:form.elements.name.value.trim(),phone:form.elements.phone.value.trim(),email:form.elements.email.value.trim(),website:form.elements.website.value};
  const response=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
  const raw=await response.text();let data=null;try{data=JSON.parse(raw)}catch{}
- if(!data){throw new Error('Sistem pembayaran belum aktif di server (respons bukan JSON, kode '+response.status+'). Mohon coba lagi nanti atau hubungi admin via WhatsApp.')}
+ if(!data){const snip=raw.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>|<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,200);throw new Error('Respons server bukan JSON (kode '+response.status+'): '+snip)}
  if(!response.ok)throw new Error(data.error||'Tidak dapat membuat tagihan iPaymu.');
  if(!data.paymentUrl||!/^https:\/\//i.test(data.paymentUrl))throw new Error('iPaymu belum memberikan tautan pembayaran.');
  window.location.href=data.paymentUrl}
