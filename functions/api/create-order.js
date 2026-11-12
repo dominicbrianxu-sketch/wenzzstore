@@ -151,7 +151,7 @@ export async function onRequestPost({ request, env }) {
       order.status = 'PAYMENT_CREATION_FAILED';
       order.paymentError = 'Tidak dapat terhubung ke iPaymu.';
       await saveOrder(env, order);
-      return json({ error: 'Tidak dapat terhubung ke iPaymu. Coba lagi sebentar lagi.', referenceId: orderId }, 502);
+      return json({ error: 'Tidak dapat terhubung ke iPaymu. Coba lagi sebentar lagi.', referenceId: orderId }, 424);
     }
 
     let data = null;
@@ -165,7 +165,7 @@ export async function onRequestPost({ request, env }) {
       await saveOrder(env, order);
       const res = { error: 'iPaymu belum bisa membuat tagihan. Coba lagi atau hubungi admin.', referenceId: orderId };
       if (environment === 'sandbox') res.detail = reason;
-      return json(res, 502);
+      return json(res, 424);
     }
 
     // Jangan menimpa status PAID bila callback sudah masuk lebih dulu.
