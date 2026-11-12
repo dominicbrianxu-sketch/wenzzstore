@@ -91,7 +91,7 @@ try{const payload={product:selectedProduct,packageLabel:selectedPackage.label,du
  const response=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
  const raw=await response.text();let data=null;try{data=JSON.parse(raw)}catch{}
  if(!data){const snip=raw.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>|<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,200);throw new Error('Respons server bukan JSON (kode '+response.status+'): '+snip)}
- if(!response.ok)throw new Error(data.error||'Tidak dapat membuat tagihan iPaymu.');
+ if(!response.ok)throw new Error((data.error||'Tidak dapat membuat tagihan iPaymu.')+(data.detail?' [Detail iPaymu: '+data.detail+']':''));
  if(!data.paymentUrl||!/^https:\/\//i.test(data.paymentUrl))throw new Error('iPaymu belum memberikan tautan pembayaran.');
  window.location.href=data.paymentUrl}
 catch(err){errorBox.textContent=err.message||'Terjadi kesalahan. Coba lagi atau hubungi admin.';button.disabled=false;button.textContent='Bayar Sekarang'}});
