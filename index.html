@@ -1,4 +1,7 @@
 
+<script>
+'use strict';
+
 const phone = '6281315509337';
 
 const catalog = {
@@ -108,14 +111,14 @@ function waLink(product) {
   return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
 }
 
-document.getElementById('waContact').href = waLink();
-
 const modal = document.getElementById('checkoutModal');
 const form = document.getElementById('checkoutForm');
 const qtyInput = form.elements.qty;
 const errorBox = document.getElementById('checkoutError');
 const accessSelect = form.elements.accessType;
 const packageOptions = document.getElementById('packageOptions');
+
+document.getElementById('waContact').href = waLink();
 
 let selectedProduct = '';
 let selectedPackage = null;
@@ -140,21 +143,24 @@ function updateTotal() {
     money(selectedPackage.price * qty);
 }
 
-function renderPackages(p) {
+function renderPackages(product) {
   packageOptions.innerHTML = '';
   selectedPackage = null;
 
-  p.packages
-    .filter(item => Number.isSafeInteger(item[2]) && item[2] >= 1000)
-    .forEach((item, index) => {
+  product.packages
+    .filter(item =>
+      Number.isSafeInteger(item[2]) && item[2] >= 1000
+    )
+    .forEach(item => {
       const [label, duration, price] = item;
-      const l = document.createElement('label');
-      l.className = 'package-option';
+
+      const wrapper = document.createElement('label');
+      wrapper.className = 'package-option';
 
       const radio = document.createElement('input');
       radio.type = 'radio';
       radio.name = 'packageChoice';
-      radio.value = String(index);
+      radio.value = label;
       radio.required = true;
 
       const span = document.createElement('span');
@@ -162,42 +168,44 @@ function renderPackages(p) {
       strong.textContent = label;
 
       const small = document.createElement('small');
-      small.textContent = money(price) + (duration ? ' · ' + duration : '');
+      small.textContent =
+        money(price) + (duration ? ' · ' + duration : '');
 
       span.append(strong, small);
-      l.append(radio, span);
+      wrapper.append(radio, span);
 
       radio.addEventListener('change', () => {
         selectedPackage = { label, duration, price };
         updateTotal();
       });
 
-      packageOptions.append(l);
+      packageOptions.append(wrapper);
     });
 }
 
-document.querySelectorAll('[data-product]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
+document.querySelectorAll('[data-product]').forEach(link => {
+  link.addEventListener('click', event => {
+    event.preventDefault();
 
-    selectedProduct = a.dataset.product;
-    const p = catalog[selectedProduct];
+    selectedProduct = link.dataset.product;
+    const product = catalog[selectedProduct];
 
-    if (!p) {
+    if (!product) {
       window.open(waLink(selectedProduct), '_blank', 'noopener');
       return;
     }
 
     document.getElementById('checkoutProductLabel').textContent =
-      `${selectedProduct} — mulai ${money(p.start)}`;
+      `${selectedProduct} — mulai ${money(product.start)}`;
 
     form.reset();
-    renderPackages(p);
+    renderPackages(product);
     qtyInput.value = 1;
     errorBox.textContent = '';
 
     document.getElementById('accessHelp').textContent =
-      p.note + ' Harga yang ditampilkan berlaku untuk paket yang dipilih.\n' +
+      product.note +
+      ' Harga yang ditampilkan berlaku untuk paket yang dipilih. ' +
       'Pastikan jenis akses sesuai kebutuhan.';
 
     updateTotal();
@@ -212,13 +220,18 @@ document.getElementById('checkoutClose').addEventListener('click', () => {
   modal.hidden = true;
 });
 
-modal.addEventListener('click', e => {
-  if (e.target === modal) modal.hidden = true;
+modal.addEventListener('click', event => {
+  if (event.target === modal) {
+    modal.hidden = true;
+  }
 });
 
-/* CHECKOUT IPAYMU - PERBAIKAN PEMBACAAN RESPONS */
-form.addEventListener('submit', async e => {
-  e.preventDefault();
+/* =========================================
+   CHECKOUT IPAYMU
+   ========================================= */
+
+form.addEventListener('submit', async event => {
+  event.preventDefault();
 
   if (
     !selectedPackage ||
@@ -285,40 +298,50 @@ form.addEventListener('submit', async e => {
       );
     }
 
-    if (!data.paymentUrl || !/^https:\/\//i.test(data.paymentUrl)) {
+    if (
+      !data.paymentUrl ||
+      !/^https:\/\//i.test(data.paymentUrl)
+    ) {
       throw new Error(
         'Link pembayaran iPaymu tidak diterima dari server.'
       );
     }
 
-    /* Arahkan pelanggan ke halaman pembayaran iPaymu */
+    /* Arahkan pelanggan ke halaman pembayaran */
     window.location.assign(data.paymentUrl);
 
-  } catch (err) {
-    console.error('WENZZSTORE CHECKOUT ERROR:', err);
+  } catch (error) {
+    console.error('WENZZSTORE CHECKOUT ERROR:', error);
 
     errorBox.textContent =
-      err.message || 'Terjadi kesalahan. Coba lagi atau hubungi admin.';
+      error.message ||
+      'Terjadi kesalahan. Coba lagi atau hubungi admin.';
 
     button.disabled = false;
     button.textContent = 'Bayar Sekarang';
   }
 });
 
-/* MENU NAVIGASI */
+/* =========================================
+   MENU NAVIGASI
+   ========================================= */
+
 const menu = document.getElementById('menu');
 
 document.getElementById('menuBtn').addEventListener('click', () => {
   menu.classList.toggle('open');
 });
 
-menu.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
+menu.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
     menu.classList.remove('open');
   });
 });
 
-/* DARK MODE */
+/* =========================================
+   DARK MODE
+   ========================================= */
+
 const themeBtn = document.getElementById('themeBtn');
 
 themeBtn.addEventListener('click', () => {
@@ -333,3 +356,4 @@ themeBtn.addEventListener('click', () => {
 if (localStorage.getItem('wenz-theme') === 'dark') {
   document.body.classList.add('dark');
 }
+</script>
