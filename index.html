@@ -1,358 +1,102 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F97316"><meta name="description" content="Wenz Store menyediakan layanan premium digital dengan harga bersahabat dan pelayanan cepat.">
+<title>WENZZSTORE — Akun Premium Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#F97316;--blue2:#FB923C;--navy:#7C2D12;--ink:#111827;--muted:#536071;--line:#dce2e8;--paper:#fff;--soft:#f7f9fc;--card:#fff;--shadow:0 14px 35px rgba(154,52,18,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Poppins,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.7}a{color:inherit;text-decoration:none}.wrap{width:min(1180px,calc(100% - 48px));margin:auto}
+header{height:78px;background:rgba(255,255,255,.96);border-bottom:1px solid #edf0f4;position:sticky;top:0;z-index:20;backdrop-filter:blur(12px)}.nav{height:100%;display:flex;align-items:center;justify-content:space-between}.brand{font-size:28px;font-weight:800;letter-spacing:-1px;color:#9A3412}.navright{display:flex;align-items:center;gap:16px}.theme,.hamb{height:52px;width:52px;border:1px solid var(--line);border-radius:15px;background:var(--paper);display:grid;place-items:center;color:var(--ink);cursor:pointer}.hamb{border:0;font-size:29px;width:44px}.menu{display:none;position:absolute;top:78px;left:0;right:0;background:var(--paper);padding:18px 24px 24px;border-bottom:1px solid var(--line);box-shadow:var(--shadow)}.menu.open{display:grid;gap:14px}.menu a{font-weight:500;padding:8px 4px}
+.hero{background:linear-gradient(115deg,#C2410C 0%,#EA580C 55%,#FB923C 100%);color:white;padding:112px 0 118px}.hero h1{font-size:clamp(36px,5.4vw,58px);line-height:1.16;letter-spacing:-1.7px;max-width:800px;margin:0 0 28px;font-weight:800}.hero p{font-size:clamp(17px,2.1vw,25px);line-height:1.9;max-width:820px;color:#FFF7ED;margin:0 0 48px}.actions{display:flex;gap:18px;flex-wrap:wrap}.btn{display:inline-flex;justify-content:center;align-items:center;min-height:62px;padding:15px 34px;border-radius:16px;font-weight:700;font-size:17px;border:2px solid white;transition:.2s}.btn.light{background:#f5f8ff;color:#C2410C}.btn.outline{color:#fff;background:transparent}.btn:hover,.order:hover{transform:translateY(-2px);filter:brightness(1.04)}
+section{scroll-margin-top:90px}.products{padding:92px 0 80px;background:var(--soft)}.section-head{text-align:center;max-width:720px;margin:0 auto 60px}.section-head h2,.why h2{font-size:clamp(30px,4vw,40px);line-height:1.25;color:#9A3412;margin:0 0 18px;font-weight:800}.section-head p{font-size:19px;color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}.product{background:var(--card);border:1px solid var(--line);border-radius:25px;padding:40px;box-shadow:0 5px 18px rgba(124,45,18,.035);display:flex;flex-direction:column;min-height:440px}.picon{width:88px;height:88px;border-radius:23px;display:grid;place-items:center;color:white;font-size:42px;font-weight:700;margin-bottom:28px}.telegram{background:#28a6d8}.netflix{background:#e50914;font-family:Arial}.spotify{background:#1db954}.chatgpt{background:#10a386}.xicon{background:#050505}.product h3{font-size:25px;margin:0 0 12px;font-weight:700}.product p{font-size:17px;color:var(--muted);margin:0 0 30px;flex:1}.price-label{font-size:16px;color:var(--muted);margin-bottom:4px}.price{font-size:35px;color:#EA580C;font-weight:800;margin-bottom:28px;line-height:1.35}.order{background:var(--blue);color:#fff;text-align:center;padding:17px 20px;border-radius:16px;font-weight:700;font-size:18px;transition:.2s}
+.faq{padding:92px 0 100px;background:var(--soft)}.faq-list{max-width:900px;margin:auto;display:grid;gap:14px}.faq-item{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 22px;box-shadow:0 5px 18px rgba(124,45,18,.035)}.faq-item summary{cursor:pointer;list-style:none;padding:21px 34px 21px 0;font-size:18px;font-weight:600;color:var(--ink);position:relative}.faq-item summary::-webkit-details-marker{display:none}.faq-item summary:after{content:"+";position:absolute;right:0;top:14px;font-size:27px;color:var(--blue);font-weight:500}.faq-item[open] summary:after{content:"−"}.faq-item p{margin:0;padding:0 0 22px;color:var(--muted);font-size:16px;line-height:1.8}.faq-note{text-align:center;color:var(--muted);margin:32px auto 0;font-size:16px}.faq-note a{color:var(--blue);font-weight:600}.why{padding:92px 0 105px}.why h2{text-align:center;margin-bottom:70px}.whygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:42px 65px}.whyitem h3{font-size:25px;color:#9A3412;margin:0 0 12px}.whyitem p{font-size:18px;color:var(--muted);margin:0}
+.cta{background:#9A3412;color:white;text-align:center;border-radius:28px;padding:70px 28px;margin:0 auto 108px}.cta h2{font-size:42px;line-height:1.2;margin:0 0 22px}.cta p{font-size:22px;color:#FFEDD5;margin:0 auto 42px;max-width:650px}.cta .actions{justify-content:center}.cta .btn{min-width:220px}
+footer{background:#7C2D12;color:#c7d1e8;padding:78px 0 30px}.footgrid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:55px;padding-bottom:55px}.foot h3{color:white;font-size:23px;margin:0 0 18px}.foot h4{color:white;font-size:20px;margin:0 0 20px}.foot p,.foot a{font-size:17px;color:#c7d1e8}.footlinks{display:grid;gap:12px}.foot a:hover{color:white}.copyright{border-top:1px solid rgba(255,255,255,.16);padding-top:28px;text-align:center;font-size:16px;color:#c7d1e8}
+.modal-backdrop{position:fixed;inset:0;background:rgba(5,12,30,.68);z-index:100;display:grid;place-items:center;padding:18px}.modal-backdrop[hidden]{display:none}.checkout-box{position:relative;background:var(--paper);color:var(--ink);width:min(100%,480px);max-height:92vh;overflow:auto;border-radius:22px;padding:30px;box-shadow:0 25px 80px rgba(0,0,0,.3)}.checkout-box h2{margin:0 35px 8px 0;color:var(--blue)}.checkout-box>p{color:var(--muted)}.checkout-close{position:absolute;right:18px;top:14px;border:0;background:transparent;color:var(--ink);font-size:30px;cursor:pointer}.checkout-box form{display:grid;gap:14px}.checkout-box label{display:grid;gap:6px;font-weight:600}.checkout-box input,.checkout-box select{width:100%;padding:13px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font:inherit}.checkout-total{padding:12px 0;font-size:18px}.checkout-total strong{color:var(--blue);font-size:23px}.checkout-help{font-size:13px;color:var(--muted);margin:0}.checkout-box #checkoutError{color:#d22;margin:0;font-size:14px}.package-picker{border:0;padding:0;margin:0;min-width:0}.package-picker legend{font-weight:700;margin-bottom:8px}.package-options{display:grid;gap:9px}.package-option{display:flex!important;grid-template-columns:auto 1fr;align-items:center;gap:10px!important;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}.package-option:has(input:checked){border:2px solid #EA580C;background:#FFF7ED}.package-option input{width:18px!important;height:18px;margin:0;accent-color:#EA580C}.package-option span{display:flex;flex-direction:column;gap:3px}.package-option small{font-weight:400;color:var(--muted)}
+/* dark mode */body.dark{--ink:#eef2ff;--muted:#E7C7B5;--line:#34415e;--paper:#101a31;--soft:#121f3b;--card:#2B211D}body.dark header{background:rgba(35,22,18,.96);border-color:#563326}body.dark .brand,body.dark .section-head h2,body.dark .why h2,body.dark .whyitem h3{color:#FDBA74}body.dark .theme{background:#2B211D;color:#fff}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.product{padding:32px;min-height:420px}.footgrid{grid-template-columns:1fr 1fr}.footgrid .foot:first-child{grid-column:1/-1}}
+@media(max-width:600px){.wrap{width:calc(100% - 54px)}header{height:78px}.brand{font-size:27px}.theme{width:52px;height:52px}.hero{padding:124px 0 152px}.hero h1{font-size:38px;letter-spacing:-1px;margin-bottom:28px}.hero p{font-size:19px;line-height:1.9;margin-bottom:48px}.actions{gap:14px}.btn{min-height:90px;padding:15px 24px;border-radius:17px;font-size:17px;flex:1}.products{padding:112px 0 80px}.section-head{margin-bottom:70px}.section-head h2{font-size:34px}.section-head p{font-size:18px;line-height:1.8}.grid{grid-template-columns:1fr;gap:34px}.product{padding:40px;min-height:570px;border-radius:25px}.picon{width:88px;height:88px}.product h3{font-size:25px}.product p{font-size:18px;line-height:1.75}.price{font-size:36px}.order{padding:22px 16px;font-size:18px}.faq{padding:82px 0}.faq-item{padding:0 18px}.faq-item summary{font-size:16px;line-height:1.6;padding:19px 30px 19px 0}.faq-item p{font-size:15px;line-height:1.8}.faq-note{font-size:15px;line-height:1.8}.why{padding:100px 0 105px}.why h2{font-size:35px;margin-bottom:75px}.whygrid{grid-template-columns:1fr;gap:42px}.whyitem h3{font-size:25px}.whyitem p{font-size:18px;line-height:1.8}.cta{border-radius:25px;padding:78px 28px;margin-bottom:108px}.cta h2{font-size:39px}.cta p{font-size:20px;line-height:1.8}.cta .actions{flex-wrap:nowrap}.cta .btn{min-width:0;min-height:90px;padding:12px 16px}.footgrid{grid-template-columns:1fr;gap:42px;padding-bottom:55px}.footgrid .foot:first-child{grid-column:auto}.foot p,.foot a{font-size:18px;line-height:1.8}.copyright{font-size:16px;line-height:1.7}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="#home">WENZSTORE</a><div class="navright"><button class="theme" id="themeBtn" aria-label="Ubah tema"><svg id="themeIcon" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/></svg></button><button class="hamb" id="menuBtn" aria-label="Buka menu">☰</button></div></div><nav class="menu" id="menu"><a href="#home">Beranda</a><a href="#produk">Produk</a><a href="#tentang">Tentang Kami</a><a href="#faq">FAQ</a><a href="#kontak">Kontak</a></nav></header>
+<main>
+<section class="hero" id="home"><div class="wrap"><h1>Akun Premium Digital,<br>Harga Bersahabat</h1><p>WenzzStore menyediakan berbagai layanan premium digital seperti Telegram Premium, Netflix, Spotify, ChatGPT, dan lainnya. Proses cepat, pelayanan ramah, dan kebijakan refund yang jelas.</p><div class="actions"><a class="btn light" href="#produk">Lihat Produk</a><a class="btn outline" href="#kontak">Hubungi Kami</a></div></div></section>
+<section class="products" id="produk"><div class="wrap"><div class="section-head"><h2>Daftar Produk</h2><p>Semua harga di bawah adalah harga final. Pilih paket, isi data, lalu bayar langsung melalui iPaymu — tanpa menunggu konfirmasi admin.</p></div><div class="grid">
+<article class="product"><div class="picon telegram">➤</div><h3>Telegram Premium</h3><p>Layanan langganan resmi Telegram dengan batas penggunaan lebih tinggi, unggahan file hingga 4 GB, unduhan lebih cepat, transkripsi suara, stiker dan reaksi eksklusif, serta fitur pengelolaan chat tambahan. Pilihan durasi gift tersedia 3, 6, atau 12 bulan. Fitur berlaku pada akun penerima.</p><div class="price-label">Paket gift 3 bulan Rp259.000 · 6 bulan Rp369.000 · 12 bulan Rp599.000</div><div class="price">Mulai Rp259.000</div><small>Harga rekomendasi katalog; konfirmasi stok, metode aktivasi, dan harga final admin sebelum pembayaran. Jenis aktivasi dan masa garansi dikonfirmasi sebelum pembayaran.</small><a class="order" data-product="Telegram Premium" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon netflix">N</div><h3>Netflix Premium</h3><p>Layanan streaming film dan serial. Resolusi video, jumlah perangkat yang dapat menonton bersamaan, dan fitur unduhan mengikuti paket Netflix yang digunakan. Tanyakan apakah penawaran berupa profil sharing atau akses private sebelum membeli.</p><div class="price-label">Mulai dari</div><div class="price">Rp65.000</div><small>Opsi durasi 1, 3, 6, atau 12 bulan mengikuti ketersediaan supplier.</small><a class="order" data-product="Netflix Premium" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon spotify">♫</div><h3>Spotify Premium</h3><p>Mendengarkan musik bebas iklan, mengunduh lagu untuk didengarkan offline, memilih dan memutar lagu sesuai keinginan, serta kualitas audio hingga sekitar 320 kbps pada paket yang mendukung. Paket dan metode aktivasi dapat berbeda.</p><div class="price-label">Mulai dari</div><div class="price">Rp45.000</div><small>Opsi 1, 3, 6, atau 12 bulan jika tersedia. Paket private dan sharing dibedakan.</small><a class="order" data-product="Spotify Premium" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon chatgpt">✳</div><h3>ChatGPT Premium</h3><p>Paket berbayar ChatGPT memberikan batas penggunaan lebih tinggi, akses ke model penalaran dan fitur tambahan seperti suara, pembuatan gambar, unggahan serta analisis file, dan riset mendalam sesuai ketersediaan paket. Langganan aplikasi ChatGPT tidak termasuk kredit API.</p><div class="price-label">Mulai dari</div><div class="price">Rp90.000</div><small>Umumnya ditawarkan per bulan. Jenis akses private atau sharing wajib dikonfirmasi.</small><a class="order" data-product="ChatGPT Premium" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon xicon">𝕏</div><h3>X Premium</h3><p>Langganan berbayar X dengan fitur tambahan seperti edit post, undo post, unggahan media lebih panjang, dan fitur kreator tertentu. Fitur, tanda centang, serta kelayakan monetisasi bergantung pada tingkat langganan dan persyaratan akun.</p><div class="price-label">Mulai dari</div><div class="price">Rp95.000</div><small>Durasi dan tingkat Basic, Premium, atau Premium+ harus dikonfirmasi sebelum transaksi.</small><a class="order" data-product="X Premium" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon" style="background:#6B4EFF">V</div><h3>VIU Premium</h3><p>Akses konten drama Asia, film, dan program hiburan. Paket Premium dapat memberikan pengalaman menonton dengan iklan lebih sedikit atau tanpa iklan serta akses unduhan dan episode tertentu sesuai wilayah dan ketentuan layanan.</p><div class="price-label">Mulai dari</div><div class="price">Rp35.000</div><small>Opsi 1, 3, 6, atau 12 bulan mengikuti jenis akses supplier.</small><a class="order" data-product="VIU Premium" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon" style="background:#FF0033">▶</div><h3>YouTube Premium</h3><p>Menonton video tanpa iklan, memutar video di latar belakang, mengunduh video untuk offline, serta menikmati YouTube Music Premium. Ketersediaan fitur dan paket mengikuti negara serta jenis langganan.</p><div class="price-label">Mulai dari</div><div class="price">Rp50.000</div><small>Opsi 1, 3, 6, atau 12 bulan jika tersedia; private dan family sharing memiliki ketentuan berbeda.</small><a class="order" data-product="YouTube Premium" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon" style="background:#00AEEF">iQ</div><h3>iQIYI Premium</h3><p>Akses VIP untuk menikmati pilihan drama, anime, dan film di iQIYI. Fitur dapat mencakup tayangan VIP, kualitas video lebih tinggi, dan unduhan offline sesuai tingkat VIP, judul, serta perangkat yang didukung.</p><div class="price-label">Mulai dari</div><div class="price">Rp50.000</div><small>Opsi 1, 3, 6, atau 12 bulan mengikuti ketersediaan voucher atau akun.</small><a class="order" data-product="iQIYI Premium" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon" style="background:#7D2AE8">C</div><h3>Canva Pro</h3><p>Fitur desain premium mencakup pustaka konten premium, Brand Kit, pengubah ukuran desain, Background Remover, dan fitur produktivitas tambahan. Fitur yang tersedia mengikuti jenis paket dan status keanggotaan.</p><div class="price-label">Mulai dari</div><div class="price">Rp18.000</div><small>Opsi 1, 3, 6, atau 12 bulan jika tersedia. Undangan tim dan akun pribadi bukan produk yang sama.</small><a class="order" data-product="Canva Pro" href="#">Beli Sekarang</a></article>
+<article class="product"><div class="picon" style="background:#113CCF">D+</div><h3>Disney+ Premium</h3><p>Layanan streaming film dan serial dari Disney, Pixar, Marvel, Star Wars, National Geographic, dan konten lain sesuai katalog wilayah. Resolusi, jumlah layar, dan perangkat mengikuti paket yang dipilih.</p><div class="price-label">Mulai dari</div><div class="price">Rp70.000</div><small>Opsi 1, 3, 6, atau 12 bulan jika tersedia dari supplier.</small><a class="order" data-product="Disney+ Premium" href="#">Beli Sekarang</a></article>
+</div></div></section>
+<section class="why" id="tentang"><div class="wrap"><h2>Kenapa Wenz Store?</h2><div class="whygrid"><div class="whyitem"><h3>Harga Terjangkau</h3><p>Harga bersaing untuk berbagai layanan premium digital.</p></div><div class="whyitem"><h3>Proses Cepat</h3><p>Pesanan diproses segera setelah pembayaran terverifikasi.</p></div><div class="whyitem"><h3>Refund Jelas</h3><p>Ada kendala? Pengajuan refund diproses sesuai <a href="refund.html" style="color:var(--blue)">kebijakan refund</a> kami.</p></div><div class="whyitem"><h3>Admin Responsif</h3><p>Admin siap membantu melalui WhatsApp, Telegram, dan email.</p></div></div></div></section>
+<section class="faq" id="faq"><div class="wrap"><div class="section-head"><h2>FAQ</h2><p>Temukan jawaban untuk pertanyaan yang sering diajukan pelanggan Wenz Store.</p></div><div class="faq-list">
+<details class="faq-item"><summary>Bagaimana cara memesan produk di Wenz Store?</summary><p>Pilih produk, tekan tombol <strong>Beli Sekarang</strong>, pilih paket, isi data diri, lalu kamu langsung diarahkan ke halaman pembayaran iPaymu. Tidak perlu menunggu konfirmasi admin.</p></details>
+<details class="faq-item"><summary>Bagaimana cara mengetahui harga dan pilihan paket?</summary><p>Harga yang tercantum pada pilihan paket adalah harga final yang akan dibayar. Paket yang belum memiliki harga tidak ditampilkan.</p></details>
+<details class="faq-item"><summary>Metode pembayaran apa saja yang tersedia?</summary><p>Pembayaran diproses oleh iPaymu (misalnya virtual account, QRIS, dan metode lain yang tersedia di halaman pembayaran). Bayar hanya melalui halaman pembayaran iPaymu yang dibuka dari website ini.</p></details>
+<details class="faq-item"><summary>Berapa lama pesanan diproses?</summary><p>Pesanan diproses setelah pembayaran terverifikasi otomatis oleh iPaymu. Estimasi waktu dapat berbeda sesuai produk dan ketersediaan; admin akan menghubungi lewat WhatsApp atau email.</p></details>
+<details class="faq-item"><summary>Apakah semua produk selalu tersedia?</summary><p>Ketersediaan produk dan paket dapat berubah. Hubungi admin terlebih dahulu untuk memastikan produk yang kamu inginkan tersedia.</p></details>
+<details class="faq-item"><summary>Apa perbedaan paket private dan sharing?</summary><p>Paket private ditujukan untuk penggunaan pribadi sesuai ketentuan layanan. Paket sharing menggunakan akses atau profil yang dibagi dengan pengguna lain dan dapat memiliki batasan perangkat atau penggunaan. Admin akan menjelaskan jenis akses yang tersedia sebelum pembayaran.</p></details>
+<details class="faq-item"><summary>Apakah pembelian mendapatkan garansi?</summary><p>WENZZSTORE menyediakan garansi supplier untuk produk yang memenuhi ketentuan paket. Lama garansi, cakupan, pengecualian, dan prosedur klaim berbeda-beda; minta rinciannya secara tertulis sebelum pembayaran.</p></details>
+<details class="faq-item"><summary>Bagaimana jika pesanan bermasalah atau ingin mengajukan refund?</summary><p>Hubungi admin melalui WhatsApp dan sertakan informasi pesanan serta bukti transaksi. Pengajuan refund akan ditinjau sesuai <a href="refund.html" style="color:var(--blue);font-weight:600">Kebijakan Refund</a> Wenz Store.</p></details>
+<details class="faq-item"><summary>Apakah data pribadi saya aman?</summary><p>Informasi pelanggan digunakan untuk membantu proses pemesanan dan layanan. Silakan baca <a href="privacy.html" style="color:var(--blue);font-weight:600">Kebijakan Privasi</a> untuk mengetahui penjelasan lebih lanjut. Jangan pernah membagikan kata sandi atau kode OTP kepada siapa pun.</p></details>
+<details class="faq-item"><summary>Bagaimana cara menghubungi admin?</summary><p>Kamu bisa menghubungi admin melalui tombol WhatsApp atau Telegram pada website. Untuk pemesanan, WhatsApp menjadi jalur yang praktis karena pesan produk dapat dibuat otomatis.</p></details>
+</div><p class="faq-note">Masih ada pertanyaan? <a href="#kontak">Hubungi admin Wenz Store</a>.</p></div></section>
+<section class="wrap" id="kontak"><div class="cta"><h2>Siap Order?</h2><p>Hubungi admin kami sekarang untuk info paket dan ketersediaan.</p><div class="actions"><a class="btn light" id="waContact" href="#">WhatsApp</a><a class="btn outline" href="https://t.me/progame88" target="_blank" rel="noopener">Telegram</a></div></div></section>
+</main>
+<div class="modal-backdrop" id="checkoutModal" hidden><div class="checkout-box" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle"><button class="checkout-close" id="checkoutClose" aria-label="Tutup">×</button><h2 id="checkoutTitle">Checkout WENZZSTORE</h2><p id="checkoutProductLabel">Produk</p><form id="checkoutForm"><label>Jenis akses<select name="accessType" id="accessType" required><option value="">Pilih jenis akses</option><option value="Private">Private / akun pribadi</option><option value="Sharing">Sharing / berbagi akses</option><option value="Voucher/Aktivasi">Voucher / aktivasi</option></select></label><small id="accessHelp" class="checkout-help">Pilih jenis akses untuk paket yang kamu inginkan.</small><fieldset class="package-picker"><legend>Pilih paket yang ingin dibeli</legend><div id="packageOptions" class="package-options"></div></fieldset><label>Nama lengkap<input name="name" required maxlength="100" autocomplete="name"></label><label>Nomor WhatsApp<input name="phone" required inputmode="tel" maxlength="20" autocomplete="tel" placeholder="08xxxxxxxxxx"></label><label>Email<input name="email" type="email" required maxlength="150" autocomplete="email"></label><label>Jumlah<input name="qty" type="number" min="1" max="10" value="1" required></label><div class="checkout-total">Total bayar: <strong id="checkoutTotal">Pilih paket</strong></div><p class="checkout-help">Harga adalah harga final. Setelah menekan tombol, kamu langsung diarahkan ke halaman pembayaran iPaymu.</p><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button class="order" id="payButton" type="submit">Bayar Sekarang</button><p id="checkoutError" role="status" aria-live="polite"></p></form></div></div>
+<footer><div class="wrap"><div class="footgrid"><div class="foot"><h3>WENZ STORE</h3><p>Toko layanan akun premium digital dengan harga terjangkau dan pelayanan cepat.</p></div><div class="foot"><h4>Informasi</h4><div class="footlinks"><a href="#tentang">Tentang Kami</a><a href="terms.html">Syarat &amp; Ketentuan</a><a href="refund.html">Kebijakan Refund</a><a href="privacy.html">Kebijakan Privasi</a></div></div><div class="foot"><h4>Kontak</h4><div class="footlinks"><a href="https://wa.me/6281315509337" target="_blank" rel="noopener">WhatsApp: 081315509337</a><a href="https://t.me/progame88" target="_blank" rel="noopener">Telegram: @progame88</a><a href="mailto:Wendy00.wg64@gmail.com">Email: Wendy00.wg64@gmail.com</a><p>Alamat usaha: Jalan Iman Bonjol No. 23, Tanjung Balai.</p></div></div></div><div class="copyright">© 2026 Wenz Store. Semua hak dilindungi.</div></div></footer>
 <script>
-'use strict';
-
-const phone = '6281315509337';
-
-const catalog = {
-  'Telegram Premium': {
-    start: 230000,
-    note: 'Gift Premium resmi Telegram. Fitur Premium melekat pada akun penerima.',
-    packages: [
-      ['Telegram Premium Gift 3 bulan', '3 bulan', 259000],
-      ['Telegram Premium Gift 6 bulan', '6 bulan', 369000],
-      ['Telegram Premium Gift 12 bulan', '12 bulan', 599000]
-    ]
-  },
-  'VIU Premium': {
-    start: 35000,
-    note: 'VIP memberikan akses konten premium dan fitur sesuai paket. Jenis akses serta masa aktif wajib dicocokkan dengan voucher/supplier.',
-    packages: [
-      ['Paket 1 bulan', '1 bulan', 35000],
-      ['Paket 3 bulan', '3 bulan', null],
-      ['Paket 6 bulan', '6 bulan', null],
-      ['Paket 12 bulan', '12 bulan', null]
-    ]
-  },
-  'ChatGPT Premium': {
-    start: 90000,
-    note: 'Pastikan paket yang ditawarkan benar-benar ChatGPT Plus/Go/Pro. Paket resmi individu tidak sama dengan akun sharing. API tidak termasuk langganan ChatGPT.',
-    packages: [
-      ['Paket 1 bulan — mulai', '1 bulan', 90000]
-    ]
-  },
-  'Spotify Premium': {
-    start: 45000,
-    note: 'Premium Standard resmi mendukung musik tanpa iklan, unduhan offline, dan audio hingga sekitar 320 kbps. Harga resmi Standard yang ditampilkan Spotify: Rp59.900/bulan; penawaran WENZZSTORE mulai Rp45.000 mengikuti jenis akses supplier.',
-    packages: [
-      ['Paket 1 bulan — mulai WENZZSTORE', '1 bulan', 45000],
-      ['Paket 3 bulan', '3 bulan', null],
-      ['Paket 6 bulan', '6 bulan', null],
-      ['Paket 12 bulan', '12 bulan', null]
-    ]
-  },
-  'X Premium': {
-    start: 95000,
-    note: 'X memiliki tingkat Basic, Premium, dan Premium+. Harga regional dan pajak dapat berubah. Tingkat dan durasi harus dikonfirmasi sebelum tagihan.',
-    packages: [
-      ['Basic 1 bulan — mulai', '1 bulan', 95000],
-      ['Premium 1 bulan', '1 bulan', null],
-      ['Premium+ 1 bulan', '1 bulan', null],
-      ['Paket tahunan', '12 bulan', null]
-    ]
-  },
-  'Netflix Premium': {
-    start: 65000,
-    note: 'Netflix resmi ditagih per bulan; resolusi dan jumlah layar tergantung paket. Penawaran sharing/reseller bukan paket resmi Netflix dan akan diberi label terpisah.',
-    packages: [
-      ['Paket 1 bulan — mulai', '1 bulan', 65000],
-      ['Paket 3 bulan', '3 bulan', null],
-      ['Paket 6 bulan', '6 bulan', null],
-      ['Paket 12 bulan', '12 bulan', null]
-    ]
-  },
-  'YouTube Premium': {
-    start: 50000,
-    note: 'YouTube Premium menawarkan tontonan tanpa iklan, pemutaran latar belakang, dan unduhan offline. Kelayakan Family mengikuti aturan rumah tangga/negara.',
-    packages: [
-      ['Paket 1 bulan — mulai', '1 bulan', 50000],
-      ['Paket 3 bulan', '3 bulan', null],
-      ['Paket 6 bulan', '6 bulan', null],
-      ['Paket 12 bulan', '12 bulan', null]
-    ]
-  },
-  'iQIYI Premium': {
-    start: 50000,
-    note: 'iQIYI menyediakan Standard VIP dan Premium/Diamond VIP dengan fitur berbeda. Harga resmi dapat berbeda menurut kanal pembelian dan promo.',
-    packages: [
-      ['Standard VIP bulanan — mulai', '1 bulan', 50000],
-      ['Premium VIP bulanan', '1 bulan', null],
-      ['Standard VIP 3 bulan', '3 bulan', null],
-      ['Standard VIP tahunan', '12 bulan', null]
-    ]
-  },
-  'Canva Pro': {
-    start: 18000,
-    note: 'Canva Pro mencakup fitur desain premium seperti aset premium, Brand Kit, dan penghapus latar. Akun pribadi dan undangan tim memiliki ketentuan berbeda.',
-    packages: [
-      ['Paket 1 bulan — mulai', '1 bulan', 18000],
-      ['Paket 3 bulan', '3 bulan', null],
-      ['Paket 6 bulan', '6 bulan', null],
-      ['Paket 12 bulan', '12 bulan', null]
-    ]
-  },
-  'Disney+ Premium': {
-    start: 70000,
-    note: 'Katalog, kualitas video, jumlah perangkat, dan masa aktif mengikuti paket Disney+ yang tersedia pada wilayah serta supplier.',
-    packages: [
-      ['Paket 1 bulan — mulai', '1 bulan', 70000],
-      ['Paket 3 bulan', '3 bulan', null],
-      ['Paket 6 bulan', '6 bulan', null],
-      ['Paket 12 bulan', '12 bulan', null]
-    ]
-  }
+const phone='6281315509337';
+const catalog={
+ 'Telegram Premium':{start:230000,note:'Gift Premium resmi Telegram. Fitur Premium melekat pada akun penerima.',packages:[['Telegram Premium Gift 3 bulan','3 bulan',259000],['Telegram Premium Gift 6 bulan','6 bulan',369000],['Telegram Premium Gift 12 bulan','12 bulan',599000]]},
+ 'VIU Premium':{start:35000,note:'VIP memberikan akses konten premium dan fitur sesuai paket. Jenis akses serta masa aktif wajib dicocokkan dengan voucher/supplier.',packages:[['Paket 1 bulan','1 bulan',35000],['Paket 3 bulan','3 bulan',null],['Paket 6 bulan','6 bulan',null],['Paket 12 bulan','12 bulan',null]]},
+ 'ChatGPT Premium':{start:90000,note:'Pastikan paket yang ditawarkan benar-benar ChatGPT Plus/Go/Pro. Paket resmi individu tidak sama dengan akun sharing. API tidak termasuk langganan ChatGPT.',packages:[['Paket 1 bulan — mulai','1 bulan',90000]]},
+ 'Spotify Premium':{start:45000,note:'Premium Standard resmi mendukung musik tanpa iklan, unduhan offline, dan audio hingga sekitar 320 kbps. Harga resmi Standard yang ditampilkan Spotify: Rp59.900/bulan; penawaran WENZZSTORE mulai Rp45.000 mengikuti jenis akses supplier.',packages:[['Paket 1 bulan — mulai WENZZSTORE','1 bulan',45000],['Paket 3 bulan','3 bulan',null],['Paket 6 bulan','6 bulan',null],['Paket 12 bulan','12 bulan',null]]},
+ 'X Premium':{start:95000,note:'X memiliki tingkat Basic, Premium, dan Premium+. Harga regional dan pajak dapat berubah. Tingkat dan durasi harus dikonfirmasi sebelum tagihan.',packages:[['Basic 1 bulan — mulai','1 bulan',95000],['Premium 1 bulan','1 bulan',null],['Premium+ 1 bulan','1 bulan',null],['Paket tahunan','12 bulan',null]]},
+ 'Netflix Premium':{start:65000,note:'Netflix resmi ditagih per bulan; resolusi dan jumlah layar tergantung paket. Penawaran sharing/reseller bukan paket resmi Netflix dan akan diberi label terpisah.',packages:[['Paket 1 bulan — mulai','1 bulan',65000],['Paket 3 bulan','3 bulan',null],['Paket 6 bulan','6 bulan',null],['Paket 12 bulan','12 bulan',null]]},
+ 'YouTube Premium':{start:50000,note:'YouTube Premium menawarkan tontonan tanpa iklan, pemutaran latar belakang, dan unduhan offline. Kelayakan Family mengikuti aturan rumah tangga/negara.',packages:[['Paket 1 bulan — mulai','1 bulan',50000],['Paket 3 bulan','3 bulan',null],['Paket 6 bulan','6 bulan',null],['Paket 12 bulan','12 bulan',null]]},
+ 'iQIYI Premium':{start:50000,note:'iQIYI menyediakan Standard VIP dan Premium/Diamond VIP dengan fitur berbeda. Harga resmi dapat berbeda menurut kanal pembelian dan promo.',packages:[['Standard VIP bulanan — mulai','1 bulan',50000],['Premium VIP bulanan','1 bulan',null],['Standard VIP 3 bulan','3 bulan',null],['Standard VIP tahunan','12 bulan',null]]},
+ 'Canva Pro':{start:18000,note:'Canva Pro mencakup fitur desain premium seperti aset premium, Brand Kit, dan penghapus latar. Akun pribadi dan undangan tim memiliki ketentuan berbeda.',packages:[['Paket 1 bulan — mulai','1 bulan',18000],['Paket 3 bulan','3 bulan',null],['Paket 6 bulan','6 bulan',null],['Paket 12 bulan','12 bulan',null]]},
+ 'Disney+ Premium':{start:70000,note:'Katalog, kualitas video, jumlah perangkat, dan masa aktif mengikuti paket Disney+ yang tersedia pada wilayah serta supplier.',packages:[['Paket 1 bulan — mulai','1 bulan',70000],['Paket 3 bulan','3 bulan',null],['Paket 6 bulan','6 bulan',null],['Paket 12 bulan','12 bulan',null]]}
 };
 
-function waLink(product) {
-  const msg = product
-    ? `Halo Admin Wenz Store, saya ingin bertanya tentang ${product}.`
-    : 'Halo Admin Wenz Store, saya ingin bertanya tentang produk dan paket yang tersedia.';
-
-  return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-}
-
-const modal = document.getElementById('checkoutModal');
-const form = document.getElementById('checkoutForm');
-const qtyInput = form.elements.qty;
-const errorBox = document.getElementById('checkoutError');
-const accessSelect = form.elements.accessType;
-const packageOptions = document.getElementById('packageOptions');
-
-document.getElementById('waContact').href = waLink();
-
-let selectedProduct = '';
-let selectedPackage = null;
-
-function money(n) {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0
-  }).format(n);
-}
-
-function updateTotal() {
-  const qty = Math.max(1, Number(qtyInput.value) || 1);
-
-  if (!selectedPackage) {
-    document.getElementById('checkoutTotal').textContent = 'Pilih paket';
-    return;
-  }
-
-  document.getElementById('checkoutTotal').textContent =
-    money(selectedPackage.price * qty);
-}
-
-function renderPackages(product) {
-  packageOptions.innerHTML = '';
-  selectedPackage = null;
-
-  product.packages
-    .filter(item =>
-      Number.isSafeInteger(item[2]) && item[2] >= 1000
-    )
-    .forEach(item => {
-      const [label, duration, price] = item;
-
-      const wrapper = document.createElement('label');
-      wrapper.className = 'package-option';
-
-      const radio = document.createElement('input');
-      radio.type = 'radio';
-      radio.name = 'packageChoice';
-      radio.value = label;
-      radio.required = true;
-
-      const span = document.createElement('span');
-      const strong = document.createElement('strong');
-      strong.textContent = label;
-
-      const small = document.createElement('small');
-      small.textContent =
-        money(price) + (duration ? ' · ' + duration : '');
-
-      span.append(strong, small);
-      wrapper.append(radio, span);
-
-      radio.addEventListener('change', () => {
-        selectedPackage = { label, duration, price };
-        updateTotal();
-      });
-
-      packageOptions.append(wrapper);
-    });
-}
-
-document.querySelectorAll('[data-product]').forEach(link => {
-  link.addEventListener('click', event => {
-    event.preventDefault();
-
-    selectedProduct = link.dataset.product;
-    const product = catalog[selectedProduct];
-
-    if (!product) {
-      window.open(waLink(selectedProduct), '_blank', 'noopener');
-      return;
-    }
-
-    document.getElementById('checkoutProductLabel').textContent =
-      `${selectedProduct} — mulai ${money(product.start)}`;
-
-    form.reset();
-    renderPackages(product);
-    qtyInput.value = 1;
-    errorBox.textContent = '';
-
-    document.getElementById('accessHelp').textContent =
-      product.note +
-      ' Harga yang ditampilkan berlaku untuk paket yang dipilih. ' +
-      'Pastikan jenis akses sesuai kebutuhan.';
-
-    updateTotal();
-    modal.hidden = false;
-    form.elements.name.focus();
-  });
-});
-
-qtyInput.addEventListener('input', updateTotal);
-
-document.getElementById('checkoutClose').addEventListener('click', () => {
-  modal.hidden = true;
-});
-
-modal.addEventListener('click', event => {
-  if (event.target === modal) {
-    modal.hidden = true;
-  }
-});
-
-/* =========================================
-   CHECKOUT IPAYMU
-   ========================================= */
-
-form.addEventListener('submit', async event => {
-  event.preventDefault();
-
-  if (
-    !selectedPackage ||
-    !Number.isSafeInteger(selectedPackage.price) ||
-    selectedPackage.price < 1000
-  ) {
-    errorBox.textContent = 'Pilih paket dengan harga yang tersedia.';
-    return;
-  }
-
-  const button = document.getElementById('payButton');
-
-  button.disabled = true;
-  button.textContent = 'Membuat pembayaran iPaymu...';
-  errorBox.textContent = '';
-
-  try {
-    const payload = {
-      product: selectedProduct,
-      packageLabel: selectedPackage.label,
-      duration: selectedPackage.duration,
-      packagePrice: selectedPackage.price,
-      accessType: accessSelect.value,
-      qty: Number(qtyInput.value),
-      name: form.elements.name.value.trim(),
-      phone: form.elements.phone.value.trim(),
-      email: form.elements.email.value.trim()
-    };
-
-    const response = await fetch('/api/create-order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    /* Baca respons sebagai teks terlebih dahulu */
-    const rawResponse = await response.text();
-
-    let data;
-
-    try {
-      data = JSON.parse(rawResponse);
-    } catch (parseError) {
-      const preview = rawResponse
-        .replace(/<[^>]*>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, 300);
-
-      throw new Error(
-        `Server mengirim respons bukan JSON. HTTP ${response.status}. ` +
-        `Isi respons: ${preview || 'Kosong'}`
-      );
-    }
-
-    if (!response.ok || data.ok === false) {
-      throw new Error(
-        data.message ||
-        data.error ||
-        `Permintaan gagal. HTTP ${response.status}`
-      );
-    }
-
-    if (
-      !data.paymentUrl ||
-      !/^https:\/\//i.test(data.paymentUrl)
-    ) {
-      throw new Error(
-        'Link pembayaran iPaymu tidak diterima dari server.'
-      );
-    }
-
-    /* Arahkan pelanggan ke halaman pembayaran */
-    window.location.assign(data.paymentUrl);
-
-  } catch (error) {
-    console.error('WENZZSTORE CHECKOUT ERROR:', error);
-
-    errorBox.textContent =
-      error.message ||
-      'Terjadi kesalahan. Coba lagi atau hubungi admin.';
-
-    button.disabled = false;
-    button.textContent = 'Bayar Sekarang';
-  }
-});
-
-/* =========================================
-   MENU NAVIGASI
-   ========================================= */
-
-const menu = document.getElementById('menu');
-
-document.getElementById('menuBtn').addEventListener('click', () => {
-  menu.classList.toggle('open');
-});
-
-menu.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    menu.classList.remove('open');
-  });
-});
-
-/* =========================================
-   DARK MODE
-   ========================================= */
-
-const themeBtn = document.getElementById('themeBtn');
-
-themeBtn.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-
-  localStorage.setItem(
-    'wenz-theme',
-    document.body.classList.contains('dark') ? 'dark' : 'light'
-  );
-});
-
-if (localStorage.getItem('wenz-theme') === 'dark') {
-  document.body.classList.add('dark');
-}
+// --- Sembunyikan paket tanpa harga; produk tanpa paket berharga disembunyikan seluruhnya ---
+const rupiahFmt=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
+Object.keys(catalog).forEach(name=>{const c=catalog[name];c.packages=c.packages.filter(x=>Number.isSafeInteger(x[2])&&x[2]>0);if(!c.packages.length){delete catalog[name];return}c.start=Math.min(...c.packages.map(x=>x[2]));c.note=c.note.replace(/[^.]*(dikonfirmasi|konfirmasi)[^.]*\.?/gi,'').trim()});
+document.querySelectorAll('article.product').forEach(card=>{const btn=card.querySelector('[data-product]');const c=btn&&catalog[btn.dataset.product];if(!c){card.remove();return}
+ const label=card.querySelector('.price-label'),price=card.querySelector('.price'),small=card.querySelector('small');
+ label.textContent=c.packages.length>1?c.packages.map(x=>`${x[1]} ${rupiahFmt(x[2])}`).join(' · '):(c.packages[0][1]?`Paket ${c.packages[0][1]}`:'Harga final');
+ price.textContent=(c.packages.length>1?'Mulai ':'')+rupiahFmt(c.start);
+ if(small)small.textContent='Harga final · bayar langsung via iPaymu.';});
+function waLink(product){const msg=product?`Halo Admin Wenz Store, saya ingin bertanya tentang ${product}.`:'Halo Admin Wenz Store, saya ingin bertanya tentang produk dan paket yang tersedia.';return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`}
+document.getElementById('waContact').href=waLink();
+const modal=document.getElementById('checkoutModal'),form=document.getElementById('checkoutForm'),qtyInput=form.elements.qty,errorBox=document.getElementById('checkoutError'),accessSelect=form.elements.accessType,packageOptions=document.getElementById('packageOptions');let selectedProduct='',selectedPackage=null;
+function money(n){return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n)}
+function updateTotal(){const qty=Math.max(1,Number(qtyInput.value)||1);if(!selectedPackage){document.getElementById('checkoutTotal').textContent='Pilih paket';return}document.getElementById('checkoutTotal').textContent=money(selectedPackage.price*qty);}
+function renderPackages(p){packageOptions.innerHTML='';selectedPackage=null;const pricedPackages=p.packages.filter(item=>Number.isSafeInteger(item[2])&&item[2]>0);if(!pricedPackages.length){packageOptions.textContent='Belum ada paket dengan harga final.';return}pricedPackages.forEach((item,index)=>{const [label,duration,price]=item;const l=document.createElement('label');l.className='package-option';const radio=document.createElement('input');radio.type='radio';radio.name='packageChoice';radio.value=String(index);radio.required=true;const span=document.createElement('span');const strong=document.createElement('strong');strong.textContent=label;const small=document.createElement('small');small.textContent=money(price)+(duration?' · '+duration:'');span.append(strong,small);l.append(radio,span);radio.addEventListener('change',()=>{selectedPackage={label,duration,price};updateTotal()});packageOptions.append(l);});}
+document.querySelectorAll('[data-product]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();selectedProduct=a.dataset.product;const p=catalog[selectedProduct];if(!p){window.open(waLink(selectedProduct),'_blank','noopener');return}document.getElementById('checkoutProductLabel').textContent=`${selectedProduct} — mulai ${money(p.start)}`;form.reset();renderPackages(p);qtyInput.value=1;errorBox.textContent='';document.getElementById('accessHelp').textContent=p.note+' Pilihan akses akan dicatat pada pesanan.';updateTotal();modal.hidden=false;form.elements.name.focus()}));
+qtyInput.addEventListener('input',updateTotal);document.getElementById('checkoutClose').addEventListener('click',()=>modal.hidden=true);modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true});
+form.addEventListener('submit',async e=>{e.preventDefault();if(!selectedPackage||!Number.isSafeInteger(selectedPackage.price)||selectedPackage.price<=0){errorBox.textContent='Pilih paket terlebih dahulu.';return}
+const button=document.getElementById('payButton');button.disabled=true;button.textContent='Membuat tagihan iPaymu...';errorBox.textContent='';
+try{const payload={product:selectedProduct,packageLabel:selectedPackage.label,duration:selectedPackage.duration,packagePrice:selectedPackage.price,accessType:accessSelect.value,qty:Number(qtyInput.value),name:form.elements.name.value.trim(),phone:form.elements.phone.value.trim(),email:form.elements.email.value.trim(),website:form.elements.website.value};
+ const response=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+ const raw=await response.text();let data=null;try{data=JSON.parse(raw)}catch{}
+ if(!data){throw new Error('Sistem pembayaran belum aktif di server (respons bukan JSON, kode '+response.status+'). Mohon coba lagi nanti atau hubungi admin via WhatsApp.')}
+ if(!response.ok)throw new Error(data.error||'Tidak dapat membuat tagihan iPaymu.');
+ if(!data.paymentUrl||!/^https:\/\//i.test(data.paymentUrl))throw new Error('iPaymu belum memberikan tautan pembayaran.');
+ window.location.href=data.paymentUrl}
+catch(err){errorBox.textContent=err.message||'Terjadi kesalahan. Coba lagi atau hubungi admin.';button.disabled=false;button.textContent='Bayar Sekarang'}});
+window.addEventListener('pageshow',()=>{const b=document.getElementById('payButton');b.disabled=false;b.textContent='Bayar Sekarang'});
+const menu=document.getElementById('menu');document.getElementById('menuBtn').addEventListener('click',()=>menu.classList.toggle('open'));menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
+const themeBtn=document.getElementById('themeBtn');themeBtn.addEventListener('click',()=>{document.body.classList.toggle('dark');localStorage.setItem('wenz-theme',document.body.classList.contains('dark')?'dark':'light')});if(localStorage.getItem('wenz-theme')==='dark')document.body.classList.add('dark');
 </script>
+</body></html>

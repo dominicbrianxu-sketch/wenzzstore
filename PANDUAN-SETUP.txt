@@ -1,0 +1,57 @@
+PANDUAN SETUP WENZZSTORE + IPAYMU (V2 - PEMBAYARAN OTOMATIS)
+(Simpan file ini di luar repository/website agar tidak terbuka untuk publik.)
+
+ALUR
+Pembeli pilih paket berharga -> isi data -> klik "Bayar Sekarang" -> langsung ke halaman iPaymu
+-> bayar -> iPaymu kirim callback -> status PAID -> admin proses pengiriman produk.
+Tidak ada konfirmasi/penetapan harga manual. Paket tanpa harga disembunyikan.
+
+PENYEBAB ERROR  "Unexpected token '<', "<!DOCTYPE"... is not valid JSON"
+Browser memanggil /api/create-order tetapi yang kembali halaman HTML, artinya folder
+functions/ tidak ter-deploy (atau Cloudflare mengembalikan halaman error). V2 sekarang:
+- backend selalu membalas JSON,
+- frontend tidak lagi crash; menampilkan pesan jelas bila respons bukan JSON.
+CEK CEPAT: buka https://wenzzstore.my.id/api/create-order di browser.
+  - Tampil JSON {"ok":true,...,"kvBound":true,"ipaymuConfigured":true} = Functions aktif & konfigurasi lengkap.
+  - Tampil halaman web/HTML = folder functions TIDAK terbaca. Pastikan functions/ ada di ROOT repo,
+    Build output directory = "." , Root directory kosong, lalu redeploy.
+  - kvBound:false = binding ORDERS belum dibuat. ipaymuConfigured:false = secret/variable belum lengkap.
+
+DEPLOY
+1. Ekstrak ZIP. Upload ISI folder ke ROOT repository GitHub (index.html, admin.html, payment-status.html,
+   functions/ harus langsung di root). Hapus file lama yang tidak ada di V2 bila perlu (README.txt, CLOUDFLARE_SETUP_ID.txt).
+2. Cloudflare Pages: Framework preset None, Build command kosong, Build output directory ".".
+3. KV: Storage & databases > KV > buat namespace (mis. WENZZSTORE_ORDERS).
+   Pages > Settings > Bindings > Add > KV namespace, Variable name PERSIS: ORDERS.
+4. Settings > Variables and Secrets (isi untuk Production, dan Preview bila dipakai):
+   - ADMIN_TOKEN (Secret)    token acak panjang >= 32 karakter
+   - IPAYMU_VA (Secret)      VA merchant (sandbox atau production sesuai IPAYMU_ENV)
+   - IPAYMU_API_KEY (Secret) API key (sandbox atau production sesuai IPAYMU_ENV)
+   - IPAYMU_ENV (Variable)   sandbox  (ubah ke production hanya setelah akun disetujui & tes lolos)
+5. REDEPLOY setelah mengubah binding/secret/variable.
+6. Dashboard iPaymu (SANDBOX dulu: https://sandbox.ipaymu.com/integration/setting):
+   Callback URL = https://wenzzstore.my.id/api/ipaymu/callback
+   (application/x-www-form-urlencoded atau application/json, keduanya didukung).
+
+TES SANDBOX (WAJIB)
+1. Buka website, pilih paket, isi data, klik Bayar Sekarang -> harus pindah ke halaman iPaymu sandbox.
+2. Selesaikan pembayaran uji. Halaman payment-status berubah ke "Pembayaran berhasil" otomatis.
+3. Buka /admin.html, masukkan ADMIN_TOKEN -> pesanan berstatus SUDAH DIBAYAR.
+4. Jika callback tidak masuk: cek Cloudflare > Pages > Functions > Logs ("invalid signature" / "amount mismatch").
+   Pastikan IPAYMU_VA yang dipakai = VA sandbox yang sama dengan akun yang menerima transaksi.
+
+PRODUCTION
+- Ganti IPAYMU_ENV=production + IPAYMU_VA/IPAYMU_API_KEY production, daftarkan callback di dashboard production, redeploy.
+- iPaymu production mensyaratkan domain/IP terdaftar. Cloudflare Pages tidak punya IP keluar statis:
+  konfirmasi tertulis ke iPaymu bahwa hosting ini diterima sebelum live.
+
+MENGUBAH HARGA / MENAMBAH PAKET
+Harga harus diubah di DUA tempat dengan label & durasi yang persis sama:
+  1) index.html  -> const catalog   2) functions/api/create-order.js -> const CATALOG
+Paket dengan harga null di index.html otomatis disembunyikan.
+
+KEAMANAN
+- Jangan menaruh VA/API Key/ADMIN_TOKEN di HTML/JS/repo publik.
+- PAID hanya diset oleh callback dengan signature valid dan nominal cocok.
+- Pembuatan pesanan dibatasi 8 per IP per 10 menit + honeypot anti-bot.
+- Admin /api/admin/confirm hanya "Buat ulang tagihan" untuk pesanan gagal buat tagihan; harga tidak bisa diubah.
