@@ -18,7 +18,7 @@ const CATALOG = {
   'Canva Pro': [{ label: 'Paket 1 bulan — mulai', duration: '1 bulan', price: 18000 }],
   'Disney+ Premium': [{ label: 'Paket 1 bulan — mulai', duration: '1 bulan', price: 70000 }]
 };
-const ACCESS_TYPES = ['Private', 'Sharing', 'Voucher/Aktivasi'];
+const ACCESS_TYPES = ['Private', 'Sharing'];
 const ORDER_TTL = 60 * 60 * 24 * 30;
 const RATE_LIMIT_MAX = 8;       // maks. pesanan per IP
 const RATE_LIMIT_WINDOW = 600;  // dalam 10 menit
