@@ -3,20 +3,45 @@
 // SEMUA respons dari endpoint ini selalu JSON (tidak pernah HTML).
 
 const CATALOG = {
-  'Telegram Premium': [
-    { label: 'Telegram Premium Gift 3 bulan', duration: '3 bulan', price: 259000 },
-    { label: 'Telegram Premium Gift 6 bulan', duration: '6 bulan', price: 369000 },
-    { label: 'Telegram Premium Gift 12 bulan', duration: '12 bulan', price: 599000 }
-  ],
-  'VIU Premium': [{ label: 'Paket 1 bulan', duration: '1 bulan', price: 35000 }],
-  'ChatGPT Premium': [{ label: 'Paket 1 bulan — mulai', duration: '1 bulan', price: 90000 }],
-  'Spotify Premium': [{ label: 'Paket 1 bulan — mulai WENZZSTORE', duration: '1 bulan', price: 45000 }],
-  'X Premium': [{ label: 'Basic 1 bulan — mulai', duration: '1 bulan', price: 95000 }],
-  'Netflix Premium': [{ label: 'Paket 1 bulan — mulai', duration: '1 bulan', price: 65000 }],
-  'YouTube Premium': [{ label: 'Paket 1 bulan — mulai', duration: '1 bulan', price: 50000 }],
-  'iQIYI Premium': [{ label: 'Standard VIP bulanan — mulai', duration: '1 bulan', price: 50000 }],
-  'Canva Pro': [{ label: 'Paket 1 bulan — mulai', duration: '1 bulan', price: 18000 }],
-  'Disney+ Premium': [{ label: 'Paket 1 bulan — mulai', duration: '1 bulan', price: 70000 }]
+  'Telegram Premium': {
+    Private: [
+      { label: 'Telegram Premium Gift 3 bulan', duration: '3 bulan', price: 259000 },
+      { label: 'Telegram Premium Gift 6 bulan', duration: '6 bulan', price: 369000 },
+      { label: 'Telegram Premium Gift 12 bulan', duration: '12 bulan', price: 599000 }
+    ]
+  },
+  'Netflix Premium': {
+    Private: [{ label: 'Netflix Standard 1 bulan — Private', duration: '1 bulan', price: 120000 }],
+    Sharing: [{ label: 'Netflix 1 bulan — Sharing', duration: '1 bulan', price: 35000 }]
+  },
+  'Spotify Premium': {
+    Private: [{ label: 'Spotify Premium Standard 1 bulan', duration: '1 bulan', price: 60000 }]
+  },
+  'ChatGPT Premium': {
+    Private: [{ label: 'ChatGPT Plus 1 bulan', duration: '1 bulan', price: 349000 }]
+  },
+  'X Premium': {
+    Private: [{ label: 'X Premium Basic 1 bulan', duration: '1 bulan', price: 95000 }]
+  },
+  'VIU Premium': {
+    Private: [{ label: 'VIU Premium 1 bulan — Private', duration: '1 bulan', price: 35000 }],
+    Sharing: [{ label: 'VIU Premium 1 bulan — Sharing', duration: '1 bulan', price: 18000 }]
+  },
+  'YouTube Premium': {
+    Private: [{ label: 'YouTube Premium 1 bulan', duration: '1 bulan', price: 89000 }]
+  },
+  'iQIYI Premium': {
+    Private: [{ label: 'iQIYI Standard VIP 1 bulan — Private', duration: '1 bulan', price: 50000 }],
+    Sharing: [{ label: 'iQIYI Standard VIP 1 bulan — Sharing', duration: '1 bulan', price: 20000 }]
+  },
+  'Canva Pro': {
+    Private: [{ label: 'Canva Pro 1 bulan — Private', duration: '1 bulan', price: 95000 }],
+    Sharing: [{ label: 'Canva Pro 1 bulan — Sharing', duration: '1 bulan', price: 25000 }]
+  },
+  'Disney+ Premium': {
+    Private: [{ label: 'Disney+ Premium 1 bulan — Private', duration: '1 bulan', price: 119000 }],
+    Sharing: [{ label: 'Disney+ Premium 1 bulan — Sharing', duration: '1 bulan', price: 35000 }]
+  }
 };
 const ACCESS_TYPES = ['Private', 'Sharing'];
 const ORDER_TTL = 60 * 60 * 24 * 30;
@@ -100,7 +125,7 @@ export async function onRequestPost({ request, env }) {
     const phone = String(input.phone || '').replace(/[^0-9]/g, '');
     const email = String(input.email || '').trim().toLowerCase();
 
-    const selected = CATALOG[product]?.find(p => p.label === packageLabel && p.duration === duration);
+    const selected = CATALOG[product]?.[accessType]?.find(p => p.label === packageLabel && p.duration === duration);
     if (!selected) return json({ error: 'Paket tidak tersedia. Muat ulang halaman lalu pilih paket kembali.' }, 400);
     if (input.packagePrice !== undefined && Number(input.packagePrice) !== selected.price) {
       return json({ error: 'Harga paket berubah. Muat ulang halaman lalu pilih paket kembali.' }, 409);
